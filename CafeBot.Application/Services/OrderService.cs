@@ -147,7 +147,7 @@ public class OrderService : IOrderService
         order.CalculateTotal();
         order.UpdatedAt = DateTime.UtcNow;
         
-        await _unitOfWork.UpdateAsync(order);
+        await _unitOfWork.Orders.UpdateAsync(order);
         await _unitOfWork.SaveChangesAsync();
 
         return true;
