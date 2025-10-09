@@ -1,3 +1,7 @@
+using CafeBot.Core.Interfaces;
+using CafeBot.TelegramBot.Handlers;
+using CafeBot.TelegramBot.Keyboards;
+using CafeBot.TelegramBot.States;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -11,11 +15,13 @@ public class BotUpdateHandler : IUpdateHandler
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
+    private readonly IUserStateManager _stateManager;
 
-    public BotUpdateHandler(IServiceProvider serviceProvider, ILogger logger)
+    public BotUpdateHandler(IServiceProvider serviceProvider, ILogger logger, IUserStateManager stateManager)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
+        _stateManager = stateManager;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -39,49 +45,101 @@ public class BotUpdateHandler : IUpdateHandler
 
     private async Task HandleMessageAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
-        if (message.Text is not { } messageText)
+        if (message.From == null)
             return;
 
+        var userId = message.From.Id;
         var chatId = message.Chat.Id;
-        _logger.LogInformation("Получено сообщение: {Text} от {ChatId}", messageText, chatId);
+        var messageText = message.Text ?? string.Empty;
 
-        var response = messageText switch
+        _logger.LogInformation("Получено сообщение: {Text} от {UserId}", messageText, userId);
+
+        using var scope = _serviceProvider.CreateScope();
+        var commandHandler = scope.ServiceProvider.GetRequiredService<CommandHandler>();
+        var orderFlowHandler = scope.ServiceProvider.GetRequiredService<OrderFlowHandler>();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        // Проверяем команды
+        if (messageText.StartsWith("/"))
         {
-            "/start" => "👋 Добро пожаловать в CafeBot!\n\n" +
-                       "Я помогу вам управлять заказами и бронированиями.\n\n" +
-                       "Используйте команды:\n" +
-                       "/rooms - Посмотреть комнаты\n" +
-                       "/orders - Активные заказы\n" +
-                       "/help - Помощь",
-            
-            "/help" => "📋 Доступные команды:\n\n" +
-                      "/start - Начать работу\n" +
-                      "/rooms - Список комнат\n" +
-                      "/orders - Активные заказы\n" +
-                      "/help - Эта справка",
-            
-            "/rooms" => "🏠 Функция просмотра комнат в разработке...",
-            "/orders" => "📝 Функция просмотра заказов в разработке...",
-            
-            _ => "❓ Неизвестная команда. Используйте /help для списка команд."
-        };
+            await commandHandler.HandleCommandAsync(message, cancellationToken);
+            return;
+        }
 
+        // Проверяем кнопки главного меню
+        if (messageText == "🆕 Создать заказ")
+        {
+            var employee = await unitOfWork.Employees.GetByTelegramIdAsync(userId);
+            if (employee == null || !employee.IsActive)
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: "❌ У вас нет доступа к боту.",
+                    cancellationToken: cancellationToken
+                );
+                return;
+            }
+
+            await orderFlowHandler.StartOrderCreationAsync(chatId, userId, cancellationToken);
+            return;
+        }
+
+        if (messageText == "📝 Мои заказы")
+        {
+            await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "📝 Функция просмотра заказов в разработке...",
+                cancellationToken: cancellationToken
+            );
+            return;
+        }
+
+        if (messageText == "🏠 Комнаты")
+        {
+            await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "🏠 Функция просмотра комнат в разработке...",
+                cancellationToken: cancellationToken
+            );
+            return;
+        }
+
+        if (messageText == "ℹ️ Помощь")
+        {
+            await commandHandler.HandleCommandAsync(new Message { Text = "/help", Chat = message.Chat, From = message.From }, cancellationToken);
+            return;
+        }
+
+        // Обрабатываем текстовый ввод в зависимости от состояния
+        var currentState = _stateManager.GetState(userId);
+        if (currentState != UserState.None)
+        {
+            await orderFlowHandler.HandleTextMessageAsync(message, userId, cancellationToken);
+            return;
+        }
+
+        // Неизвестное сообщение
         await botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: response,
+            text: "❓ Используйте кнопки меню или команды.",
+            replyMarkup: KeyboardBuilder.MainMenuKeyboard(),
             cancellationToken: cancellationToken
         );
     }
 
     private async Task HandleCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Получен callback: {Data}", callbackQuery.Data);
+        if (callbackQuery.From == null || callbackQuery.Message == null)
+            return;
 
-        await botClient.AnswerCallbackQueryAsync(
-            callbackQueryId: callbackQuery.Id,
-            text: "В разработке...",
-            cancellationToken: cancellationToken
-        );
+        var userId = callbackQuery.From.Id;
+        
+        _logger.LogInformation("Получен callback: {Data} от {UserId}", callbackQuery.Data, userId);
+
+        using var scope = _serviceProvider.CreateScope();
+        var orderFlowHandler = scope.ServiceProvider.GetRequiredService<OrderFlowHandler>();
+
+        await orderFlowHandler.HandleCallbackAsync(callbackQuery, userId, cancellationToken);
     }
 
     public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)

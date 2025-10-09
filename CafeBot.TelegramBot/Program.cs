@@ -3,17 +3,23 @@ using CafeBot.Core.Interfaces;
 using CafeBot.Infrastructure.Data;
 using CafeBot.Infrastructure.Repositories;
 using CafeBot.TelegramBot.Bot;
+using CafeBot.TelegramBot.Data;
+using CafeBot.TelegramBot.Handlers;
+using CafeBot.TelegramBot.States;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+// Получаем строку подключения
+var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"] 
+    ?? throw new Exception("Connection string not found");
+
 // Добавляем DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // Регистрируем UnitOfWork и Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -24,9 +30,16 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
+// Регистрируем State Manager (Singleton!)
+builder.Services.AddSingleton<IUserStateManager, UserStateManager>();
+
+// Регистрируем Handlers
+builder.Services.AddScoped<CommandHandler>();
+builder.Services.AddScoped<OrderFlowHandler>();
+
 // Регистрируем Telegram Bot Client
 var botToken = builder.Configuration["Telegram:BotToken"] 
-    ?? throw new Exception("Telegram Bot Token not found in configuration");
+    ?? throw new Exception("Telegram Bot Token not found");
 
 builder.Services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(botToken));
 
@@ -34,6 +47,13 @@ builder.Services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(botToken
 builder.Services.AddHostedService<BotBackgroundService>();
 
 var host = builder.Build();
+
+// Заполняем БД тестовыми данными при первом запуске
+using (var scope = host.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await DbSeeder.SeedDataAsync(context);
+}
 
 Console.WriteLine("🤖 CafeBot запущен!");
 Console.WriteLine("Нажмите Ctrl+C для остановки...");
