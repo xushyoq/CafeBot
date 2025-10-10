@@ -141,15 +141,17 @@ public class OrderService : IOrderService
         orderItem.CalculateSubtotal();
 
         await _unitOfWork.OrderItems.AddAsync(orderItem);
-        
-        // Пересчитываем общую сумму
-        order.OrderItems.Add(orderItem);
-        order.CalculateTotal();
-        order.UpdatedAt = DateTime.UtcNow;
-        
-        await _unitOfWork.Orders.UpdateAsync(order);
         await _unitOfWork.SaveChangesAsync();
 
+        // Перезагружаем заказ с актуальными OrderItems из БД
+        var updatedOrder = await _unitOfWork.Orders.GetOrderWithDetailsAsync(orderId);
+        if (updatedOrder != null)
+        {
+            updatedOrder.CalculateTotal();
+            updatedOrder.UpdatedAt = DateTime.UtcNow;
+            await _unitOfWork.Orders.UpdateAsync(updatedOrder);
+            await _unitOfWork.SaveChangesAsync();
+        }
         return true;
     }
 

@@ -34,9 +34,12 @@ public class Order
     
     // Бизнес-логика
     public void CalculateTotal()
+{
+    if (OrderItems != null && OrderItems.Any())
     {
         TotalAmount = OrderItems.Sum(item => item.Subtotal);
     }
+}
     
     public bool CanBeCancelled()
     {
