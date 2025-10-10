@@ -86,11 +86,8 @@ public class BotUpdateHandler : IUpdateHandler
 
         if (messageText == "📝 Мои заказы")
         {
-            await botClient.SendTextMessageAsync(
-                chatId: chatId,
-                text: "📝 Функция просмотра заказов в разработке...",
-                cancellationToken: cancellationToken
-            );
+            var orderListHandler = scope.ServiceProvider.GetRequiredService<OrderListHandler>();
+            await orderListHandler.ShowMyOrdersAsync(chatId, userId, cancellationToken);
             return;
         }
 
@@ -133,12 +130,35 @@ public class BotUpdateHandler : IUpdateHandler
             return;
 
         var userId = callbackQuery.From.Id;
-        
-        _logger.LogInformation("Получен callback: {Data} от {UserId}", callbackQuery.Data, userId);
+        var chatId = callbackQuery.Message.Chat.Id;
+        var data = callbackQuery.Data ?? string.Empty;
+
+        _logger.LogInformation("Получен callback: {Data} от {UserId}", data, userId);
 
         using var scope = _serviceProvider.CreateScope();
         var orderFlowHandler = scope.ServiceProvider.GetRequiredService<OrderFlowHandler>();
+        var orderListHandler = scope.ServiceProvider.GetRequiredService<OrderListHandler>();
 
+        // Обработка просмотра заказов
+        if (data.StartsWith("vieworder_"))
+        {
+            var orderIdStr = data.Replace("vieworder_", "");
+            if (int.TryParse(orderIdStr, out var orderId))
+            {
+                await orderListHandler.ShowOrderDetailsAsync(chatId, orderId, cancellationToken);
+            }
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
+        if (data == "refresh_orders" || data == "back_to_orders")
+        {
+            await orderListHandler.ShowMyOrdersAsync(chatId, userId, cancellationToken);
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
+        // Остальные callback передаем в orderFlowHandler
         await orderFlowHandler.HandleCallbackAsync(callbackQuery, userId, cancellationToken);
     }
 

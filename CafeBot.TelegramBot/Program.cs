@@ -36,6 +36,7 @@ builder.Services.AddSingleton<IUserStateManager, UserStateManager>();
 // Регистрируем Handlers
 builder.Services.AddScoped<CommandHandler>();
 builder.Services.AddScoped<OrderFlowHandler>();
+builder.Services.AddScoped<OrderListHandler>();
 
 // Регистрируем Telegram Bot Client
 var botToken = builder.Configuration["Telegram:BotToken"] 

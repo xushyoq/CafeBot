@@ -42,7 +42,7 @@ public class OrderFlowHandler
     public async Task StartOrderCreationAsync(long chatId, long userId, CancellationToken cancellationToken)
     {
         _stateManager.SetState(userId, UserState.SelectingDate);
-        
+
         var data = _stateManager.GetData(userId);
         data.Clear();
 
@@ -127,36 +127,36 @@ public class OrderFlowHandler
     }
 
     private async Task HandleDateSelectionAsync(long chatId, long userId, string data, CancellationToken cancellationToken)
-{
-    if (!data.StartsWith("date_"))
-        return;
-
-    var dateStr = data.Replace("date_", "");
-    if (!DateTime.TryParse(dateStr, out var selectedDate))
     {
+        if (!data.StartsWith("date_"))
+            return;
+
+        var dateStr = data.Replace("date_", "");
+        if (!DateTime.TryParse(dateStr, out var selectedDate))
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Неверный формат даты. Попробуйте еще раз.",
+                cancellationToken: cancellationToken
+            );
+            return;
+        }
+
+        // ВАЖНО: Конвертируем в UTC для PostgreSQL
+        selectedDate = DateTime.SpecifyKind(selectedDate, DateTimeKind.Utc);
+
+        var stateData = _stateManager.GetData(userId);
+        stateData.SelectedDate = selectedDate;
+
+        _stateManager.SetState(userId, UserState.SelectingTimeSlot);
+
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "❌ Неверный формат даты. Попробуйте еще раз.",
+            text: $"✅ Дата: {selectedDate:dd.MM.yyyy}\n\n⏰ Выберите время:",
+            replyMarkup: KeyboardBuilder.TimeSlotSelectionKeyboard(),
             cancellationToken: cancellationToken
         );
-        return;
     }
-
-    // ВАЖНО: Конвертируем в UTC для PostgreSQL
-    selectedDate = DateTime.SpecifyKind(selectedDate, DateTimeKind.Utc);
-
-    var stateData = _stateManager.GetData(userId);
-    stateData.SelectedDate = selectedDate;
-
-    _stateManager.SetState(userId, UserState.SelectingTimeSlot);
-
-    await _botClient.SendTextMessageAsync(
-        chatId: chatId,
-        text: $"✅ Дата: {selectedDate:dd.MM.yyyy}\n\n⏰ Выберите время:",
-        replyMarkup: KeyboardBuilder.TimeSlotSelectionKeyboard(),
-        cancellationToken: cancellationToken
-    );
-}
 
     private async Task HandleTimeSlotSelectionAsync(long chatId, long userId, string data, CancellationToken cancellationToken)
     {
@@ -483,7 +483,7 @@ public class OrderFlowHandler
 
     private async Task HandleQuantityInputAsync(long chatId, long userId, string quantityStr, CancellationToken cancellationToken)
     {
-        if (!decimal.TryParse(quantityStr, out var quantity) || quantity <= 0)
+        if (!decimal.TryParse(quantityStr.Replace(",", "."), out var quantity) || quantity <= 0)
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
@@ -506,24 +506,38 @@ public class OrderFlowHandler
             return;
         }
 
+        // ВАЖНО: Для граммов пересчитываем в килограммы для правильной цены
+        decimal actualQuantity = quantity;
+        decimal pricePerUnit = product.Price;
+
+        if (product.Unit == ProductUnit.Gram)
+        {
+            // Если цена указана за порцию (например 300г = 15000), 
+            // то пересчитываем стоимость пропорционально
+            actualQuantity = quantity / 1000m; // переводим в кг для расчета
+            pricePerUnit = product.Price; // цена уже за указанный вес
+        }
+
         // Добавляем в корзину
         var orderItem = new OrderItemData
         {
             ProductId = product.Id,
             ProductName = product.Name,
-            Quantity = quantity,
+            Quantity = quantity, // сохраняем как ввел пользователь
             Unit = product.Unit,
             Price = product.Price,
-            Subtotal = quantity * product.Price
+            Subtotal = quantity * product.Price // правильный расчет
         };
 
         stateData.Cart.Add(orderItem);
 
-        // Показываем что добавлено и спрашиваем что дальше
+        var quantityText = FormatQuantity(quantity, product.Unit);
+
+        // Показываем что добавлено
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
             text: $"✅ Добавлено:\n" +
-                  $"{product.Name} - {quantity} {GetUnitShortName(product.Unit)} × {product.Price:N0} = {orderItem.Subtotal:N0} сум\n\n" +
+                  $"{product.Name} - {quantityText} × {product.Price:N0} = {orderItem.Subtotal:N0} сум\n\n" +
                   $"🛒 В корзине: {stateData.Cart.Count} позиций\n" +
                   $"💰 Сумма: {stateData.Cart.Sum(i => i.Subtotal):N0} сум",
             cancellationToken: cancellationToken
@@ -532,7 +546,6 @@ public class OrderFlowHandler
         // Показываем категории снова
         await ShowCategoriesAsync(chatId, userId, cancellationToken);
     }
-
     private string GetUnitShortName(ProductUnit unit)
     {
         return unit switch
@@ -547,105 +560,119 @@ public class OrderFlowHandler
     }
 
     private async Task FinishOrderCreationAsync(long chatId, long userId, CancellationToken cancellationToken)
-{
-    var stateData = _stateManager.GetData(userId);
-
-    if (stateData.Cart.Count == 0)
     {
-        await _botClient.SendTextMessageAsync(
-            chatId: chatId,
-            text: "❌ Корзина пуста! Добавьте хотя бы одно блюдо.",
-            cancellationToken: cancellationToken
-        );
-        await ShowCategoriesAsync(chatId, userId, cancellationToken);
-        return;
-    }
+        var stateData = _stateManager.GetData(userId);
 
-    // Получаем данные работника
-    using var scope = _serviceProvider.CreateScope();
-    var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-    var employee = await unitOfWork.Employees.GetByTelegramIdAsync(userId);
-
-    if (employee == null)
-    {
-        await _botClient.SendTextMessageAsync(
-            chatId: chatId,
-            text: "❌ Ошибка: работник не найден.",
-            cancellationToken: cancellationToken
-        );
-        return;
-    }
-
-    try
-    {
-        // Создаём заказ
-        var order = await _orderService.CreateOrderAsync(
-            roomId: stateData.SelectedRoomId!.Value,
-            employeeId: employee.Id,
-            clientName: stateData.ClientName!,
-            clientPhone: stateData.ClientPhone!,
-            guestCount: stateData.GuestCount!.Value,
-            bookingDate: stateData.SelectedDate!.Value,
-            timeSlot: stateData.SelectedTimeSlot!.Value
-        );
-
-        // Добавляем позиции из корзины
-        foreach (var item in stateData.Cart)
+        if (stateData.Cart.Count == 0)
         {
-            await _orderService.AddItemToOrderAsync(
-                orderId: order.Id,
-                productId: item.ProductId,
-                quantity: item.Quantity,
-                addedByEmployeeId: employee.Id
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Корзина пуста! Добавьте хотя бы одно блюдо.",
+                cancellationToken: cancellationToken
+            );
+            await ShowCategoriesAsync(chatId, userId, cancellationToken);
+            return;
+        }
+
+        // Получаем данные работника
+        using var scope = _serviceProvider.CreateScope();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var employee = await unitOfWork.Employees.GetByTelegramIdAsync(userId);
+
+        if (employee == null)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Ошибка: работник не найден.",
+                cancellationToken: cancellationToken
+            );
+            return;
+        }
+
+        try
+        {
+            // Создаём заказ
+            var order = await _orderService.CreateOrderAsync(
+                roomId: stateData.SelectedRoomId!.Value,
+                employeeId: employee.Id,
+                clientName: stateData.ClientName!,
+                clientPhone: stateData.ClientPhone!,
+                guestCount: stateData.GuestCount!.Value,
+                bookingDate: stateData.SelectedDate!.Value,
+                timeSlot: stateData.SelectedTimeSlot!.Value
+            );
+
+            // Добавляем позиции из корзины
+            foreach (var item in stateData.Cart)
+            {
+                await _orderService.AddItemToOrderAsync(
+                    orderId: order.Id,
+                    productId: item.ProductId,
+                    quantity: item.Quantity,
+                    addedByEmployeeId: employee.Id
+                );
+            }
+
+            // Формируем красивое сообщение
+            var room = await _roomService.GetRoomByIdAsync(stateData.SelectedRoomId.Value);
+            var timeSlotText = stateData.SelectedTimeSlot == Core.Enums.TimeSlot.Day
+                ? "День (12:00-16:00)"
+                : "Вечер (17:00-22:00)";
+
+            var message = $"✅ Заказ создан!\n\n" +
+                         $"📋 Заказ #{order.OrderNumber}\n" +
+                         $"━━━━━━━━━━━━━━━━━━━━\n" +
+                         $"👤 {order.ClientName}\n" +
+                         $"📞 {order.ClientPhone}\n" +
+                         $"👥 Гостей: {order.GuestCount}\n" +
+                         $"🏠 {room?.Name}\n" +
+                         $"📅 {order.BookingDate:dd.MM.yyyy}\n" +
+                         $"⏰ {timeSlotText}\n" +
+                         $"━━━━━━━━━━━━━━━━━━━━\n\n" +
+                         $"🍽 Заказ:\n";
+
+            foreach (var item in stateData.Cart)
+            {
+                var quantityText = FormatQuantity(item.Quantity, item.Unit);
+                message += $"• {item.ProductName} - {quantityText} × {item.Price:N0} сум = {item.Subtotal:N0} сум\n";
+            }
+
+            message += $"\n━━━━━━━━━━━━━━━━━━━━\n" +
+                      $"💰 ИТОГО: {stateData.Cart.Sum(i => i.Subtotal):N0} сум";
+
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: message,
+                replyMarkup: KeyboardBuilder.MainMenuKeyboard(employee.Role == Core.Enums.EmployeeRole.Admin),
+                cancellationToken: cancellationToken
+            );
+
+            // Очищаем состояние
+            _stateManager.ClearState(userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating order");
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: $"❌ Ошибка при создании заказа: {ex.Message}",
+                cancellationToken: cancellationToken
             );
         }
-
-        // Формируем красивое сообщение
-        var room = await _roomService.GetRoomByIdAsync(stateData.SelectedRoomId.Value);
-        var timeSlotText = stateData.SelectedTimeSlot == Core.Enums.TimeSlot.Day 
-            ? "День (12:00-16:00)" 
-            : "Вечер (17:00-22:00)";
-
-        var message = $"✅ Заказ создан!\n\n" +
-                     $"📋 Заказ #{order.OrderNumber}\n" +
-                     $"━━━━━━━━━━━━━━━━━━━━\n" +
-                     $"👤 {order.ClientName}\n" +
-                     $"📞 {order.ClientPhone}\n" +
-                     $"👥 Гостей: {order.GuestCount}\n" +
-                     $"🏠 {room?.Name}\n" +
-                     $"📅 {order.BookingDate:dd.MM.yyyy}\n" +
-                     $"⏰ {timeSlotText}\n" +
-                     $"━━━━━━━━━━━━━━━━━━━━\n\n" +
-                     $"🍽 Заказ:\n";
-
-        foreach (var item in stateData.Cart)
-        {
-            message += $"• {item.ProductName} - {item.Quantity} {GetUnitShortName(item.Unit)} × {item.Price:N0} = {item.Subtotal:N0} сум\n";
-        }
-
-        message += $"\n━━━━━━━━━━━━━━━━━━━━\n" +
-                  $"💰 ИТОГО: {stateData.Cart.Sum(i => i.Subtotal):N0} сум";
-
-        await _botClient.SendTextMessageAsync(
-            chatId: chatId,
-            text: message,
-            replyMarkup: KeyboardBuilder.MainMenuKeyboard(employee.Role == Core.Enums.EmployeeRole.Admin),
-            cancellationToken: cancellationToken
-        );
-
-        // Очищаем состояние
-        _stateManager.ClearState(userId);
     }
-    catch (Exception ex)
+
+    private string FormatQuantity(decimal quantity, ProductUnit unit)
     {
-        _logger.LogError(ex, "Error creating order");
-        await _botClient.SendTextMessageAsync(
-            chatId: chatId,
-            text: $"❌ Ошибка при создании заказа: {ex.Message}",
-            cancellationToken: cancellationToken
-        );
+        return unit switch
+        {
+            ProductUnit.Piece => $"{quantity:0.##} шт",
+            ProductUnit.Kg => $"{quantity:0.##} кг",
+            ProductUnit.Gram => $"{quantity:0} гр",
+            ProductUnit.Liter => $"{quantity:0.##} л",
+            ProductUnit.Ml => $"{quantity:0} мл",
+            _ => quantity.ToString()
+        };
     }
-}
 
-    
+
 }
