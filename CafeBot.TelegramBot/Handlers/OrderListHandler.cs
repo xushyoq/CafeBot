@@ -45,8 +45,8 @@ public class OrderListHandler
 
         // Получаем активные заказы этого работника
         var orders = await _unitOfWork.Orders.GetOrdersByEmployeeAsync(employee.Id);
-        
-        var activeOrders = orders.Where(o => 
+
+        var activeOrders = orders.Where(o =>
             o.Status == OrderStatus.Created ||
             o.Status == OrderStatus.Confirmed ||
             o.Status == OrderStatus.Active ||
@@ -69,7 +69,7 @@ public class OrderListHandler
         {
             var statusEmoji = GetStatusEmoji(order.Status);
             var timeSlotText = order.TimeSlot == TimeSlot.Day ? "День" : "Вечер";
-            
+
             return new[]
             {
                 InlineKeyboardButton.WithCallbackData(
@@ -98,7 +98,7 @@ public class OrderListHandler
     public async Task ShowOrderDetailsAsync(long chatId, int orderId, CancellationToken cancellationToken)
     {
         var order = await _orderService.GetOrderWithDetailsAsync(orderId);
-        
+
         if (order == null)
         {
             await _botClient.SendTextMessageAsync(
@@ -111,8 +111,8 @@ public class OrderListHandler
 
         var statusEmoji = GetStatusEmoji(order.Status);
         var statusText = GetStatusText(order.Status);
-        var timeSlotText = order.TimeSlot == TimeSlot.Day 
-            ? "День (12:00-16:00)" 
+        var timeSlotText = order.TimeSlot == TimeSlot.Day
+            ? "День (12:00-16:00)"
             : "Вечер (17:00-22:00)";
 
         var message = $"{statusEmoji} Заказ #{order.OrderNumber}\n" +
@@ -151,13 +151,13 @@ public class OrderListHandler
             });
         }
 
-        if (order.Status == OrderStatus.Confirmed || order.Status == OrderStatus.Active)
+        if (order.Status == OrderStatus.Created || order.Status == OrderStatus.Confirmed || order.Status == OrderStatus.Active)
         {
             buttons.Add(new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Дозаказать", $"addmore_{orderId}"),
-                InlineKeyboardButton.WithCallbackData("💰 К оплате", $"topayment_{orderId}")
-            });
+        InlineKeyboardButton.WithCallbackData("➕ Дозаказать", $"addmore_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("💰 К оплате", $"topayment_{orderId}")
+    });
         }
 
         if (order.Status == OrderStatus.ReadyToPay)

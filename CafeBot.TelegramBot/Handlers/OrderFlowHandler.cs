@@ -77,6 +77,26 @@ public class OrderFlowHandler
             return;
         }
 
+        // Обработка дозаказа
+        if (data == "finish_adding_items")
+        {
+            await FinishAddingItemsAsync(chatId, userId, cancellationToken);
+            await _botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
+        if (data == "cancel_adding")
+        {
+            _stateManager.ClearState(userId);
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Дозаказ отменен.",
+                cancellationToken: cancellationToken
+            );
+            await _botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
         var currentState = _stateManager.GetState(userId);
 
         try
@@ -543,8 +563,17 @@ public class OrderFlowHandler
             cancellationToken: cancellationToken
         );
 
-        // Показываем категории снова
-        await ShowCategoriesAsync(chatId, userId, cancellationToken);
+        // Проверяем это дозаказ или новый заказ
+        if (stateData.CurrentOrderId.HasValue)
+        {
+            // Дозаказ - показываем категории для дозаказа
+            await ShowCategoriesForAddingAsync(chatId, userId, cancellationToken);
+        }
+        else
+        {
+            // Новый заказ - показываем обычные категории
+            await ShowCategoriesAsync(chatId, userId, cancellationToken);
+        }
     }
     private string GetUnitShortName(ProductUnit unit)
     {
@@ -674,5 +703,165 @@ public class OrderFlowHandler
         };
     }
 
+    public async Task StartAddingItemsToOrderAsync(long chatId, long userId, int orderId, CancellationToken cancellationToken)
+{
+    var order = await _orderService.GetOrderWithDetailsAsync(orderId);
+    
+    if (order == null)
+    {
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "❌ Заказ не найден.",
+            cancellationToken: cancellationToken
+        );
+        return;
+    }
 
+    if (!order.CanAddItems())
+    {
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "❌ К этому заказу нельзя добавить позиции (заказ завершен или отменен).",
+            cancellationToken: cancellationToken
+        );
+        return;
+    }
+
+    // Сохраняем ID заказа в state
+    var stateData = _stateManager.GetData(userId);
+    stateData.Clear();
+    stateData.CurrentOrderId = orderId;
+
+    _stateManager.SetState(userId, UserState.SelectingCategory);
+
+    await _botClient.SendTextMessageAsync(
+        chatId: chatId,
+        text: $"➕ Дозаказ к заказу #{order.OrderNumber}\n\n" +
+              $"Текущая сумма: {order.TotalAmount:N0} сум\n\n" +
+              "Выберите категорию для добавления блюд:",
+        cancellationToken: cancellationToken
+    );
+
+    await ShowCategoriesForAddingAsync(chatId, userId, cancellationToken);
+}
+
+    private async Task ShowCategoriesForAddingAsync(long chatId, long userId, CancellationToken cancellationToken)
+    {
+        var categories = await _productService.GetActiveCategoriesAsync();
+
+        var buttons = categories.Select(c =>
+            new[]
+            {
+            InlineKeyboardButton.WithCallbackData($"📂 {c.Name}", $"category_{c.Id}")
+            }
+        ).ToList();
+
+        buttons.Add(new[]
+        {
+        InlineKeyboardButton.WithCallbackData("✅ Завершить дозаказ", "finish_adding_items"),
+        InlineKeyboardButton.WithCallbackData("❌ Отменить", "cancel_adding")
+    });
+
+        var keyboard = new InlineKeyboardMarkup(buttons);
+
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "📋 Выберите категорию:",
+            replyMarkup: keyboard,
+            cancellationToken: cancellationToken
+        );
+    }
+
+    private async Task FinishAddingItemsAsync(long chatId, long userId, CancellationToken cancellationToken)
+    {
+        var stateData = _stateManager.GetData(userId);
+
+        if (stateData.CurrentOrderId == null)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Ошибка: заказ не найден.",
+                cancellationToken: cancellationToken
+            );
+            return;
+        }
+
+        if (stateData.Cart.Count == 0)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Вы не добавили ни одного блюда.",
+                cancellationToken: cancellationToken
+            );
+            await ShowCategoriesForAddingAsync(chatId, userId, cancellationToken);
+            return;
+        }
+
+        using var scope = _serviceProvider.CreateScope();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var employee = await unitOfWork.Employees.GetByTelegramIdAsync(userId);
+
+        if (employee == null)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Ошибка: работник не найден.",
+                cancellationToken: cancellationToken
+            );
+            return;
+        }
+
+        try
+        {
+            // Добавляем позиции из корзины
+            foreach (var item in stateData.Cart)
+            {
+                await _orderService.AddItemToOrderAsync(
+                    orderId: stateData.CurrentOrderId.Value,
+                    productId: item.ProductId,
+                    quantity: item.Quantity,
+                    addedByEmployeeId: employee.Id
+                );
+            }
+
+            // Получаем обновленный заказ
+            var order = await _orderService.GetOrderWithDetailsAsync(stateData.CurrentOrderId.Value);
+
+            if (order != null)
+            {
+                var message = $"✅ Дозаказ успешно добавлен!\n\n" +
+                             $"📋 Заказ #{order.OrderNumber}\n" +
+                             $"━━━━━━━━━━━━━━━━━━━━\n\n" +
+                             $"➕ Добавлено:\n";
+
+                foreach (var item in stateData.Cart)
+                {
+                    var quantityText = FormatQuantity(item.Quantity, item.Unit);
+                    message += $"• {item.ProductName} - {quantityText} × {item.Price:N0} сум = {item.Subtotal:N0} сум\n";
+                }
+
+                message += $"\n━━━━━━━━━━━━━━━━━━━━\n" +
+                          $"💰 Новая сумма заказа: {order.TotalAmount:N0} сум";
+
+                await _botClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: message,
+                    replyMarkup: KeyboardBuilder.MainMenuKeyboard(employee.Role == Core.Enums.EmployeeRole.Admin),
+                    cancellationToken: cancellationToken
+                );
+            }
+
+            // Очищаем состояние
+            _stateManager.ClearState(userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding items to order");
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: $"❌ Ошибка при добавлении: {ex.Message}",
+                cancellationToken: cancellationToken
+            );
+        }
+    }
 }

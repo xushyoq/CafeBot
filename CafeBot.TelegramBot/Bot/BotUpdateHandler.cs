@@ -8,6 +8,7 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using CafeBot.Core.Enums;
 
 namespace CafeBot.TelegramBot.Bot;
 
@@ -146,6 +147,52 @@ public class BotUpdateHandler : IUpdateHandler
             if (int.TryParse(orderIdStr, out var orderId))
             {
                 await orderListHandler.ShowOrderDetailsAsync(chatId, orderId, cancellationToken);
+            }
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
+        // Обработка дозаказа
+        if (data.StartsWith("addmore_"))
+        {
+            var orderIdStr = data.Replace("addmore_", "");
+            if (int.TryParse(orderIdStr, out var orderId))
+            {
+                await orderFlowHandler.StartAddingItemsToOrderAsync(chatId, userId, orderId, cancellationToken);
+            }
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
+        // Обработка перехода к оплате
+        if (data.StartsWith("topayment_"))
+        {
+            var orderIdStr = data.Replace("topayment_", "");
+            if (int.TryParse(orderIdStr, out var orderId))
+            {
+                var paymentHandler = scope.ServiceProvider.GetRequiredService<PaymentHandler>();
+                await paymentHandler.PrepareOrderForPaymentAsync(chatId, orderId, cancellationToken);
+            }
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
+        // Обработка выбора способа оплаты
+        if (data.StartsWith("pay_"))
+        {
+            var parts = data.Split('_');
+            if (parts.Length == 3 && int.TryParse(parts[2], out var orderId))
+            {
+                var method = parts[1] switch
+                {
+                    "cash" => PaymentMethod.Cash,
+                    "card" => PaymentMethod.Card,
+                    "transfer" => PaymentMethod.Transfer,
+                    _ => PaymentMethod.Cash
+                };
+
+                var paymentHandler = scope.ServiceProvider.GetRequiredService<PaymentHandler>();
+                await paymentHandler.ProcessPaymentAsync(chatId, userId, orderId, method, cancellationToken);
             }
             await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
             return;
