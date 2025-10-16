@@ -38,6 +38,7 @@ builder.Services.AddScoped<CommandHandler>();
 builder.Services.AddScoped<OrderFlowHandler>();
 builder.Services.AddScoped<OrderListHandler>();
 builder.Services.AddScoped<PaymentHandler>();
+builder.Services.AddScoped<OrderManagementHandler>();
 
 // Регистрируем Telegram Bot Client
 var botToken = builder.Configuration["Telegram:BotToken"] 

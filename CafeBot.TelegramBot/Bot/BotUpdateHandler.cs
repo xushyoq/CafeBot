@@ -198,6 +198,45 @@ public class BotUpdateHandler : IUpdateHandler
             return;
         }
 
+        // Обработка подтверждения заказа
+        if (data.StartsWith("confirm_order_"))
+        {
+            var orderIdStr = data.Replace("confirm_order_", "");
+            if (int.TryParse(orderIdStr, out var orderId))
+            {
+                var managementHandler = scope.ServiceProvider.GetRequiredService<OrderManagementHandler>();
+                await managementHandler.ConfirmOrderAsync(chatId, orderId, cancellationToken);
+            }
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
+        // Обработка активации заказа
+        if (data.StartsWith("activate_order_"))
+        {
+            var orderIdStr = data.Replace("activate_order_", "");
+            if (int.TryParse(orderIdStr, out var orderId))
+            {
+                var managementHandler = scope.ServiceProvider.GetRequiredService<OrderManagementHandler>();
+                await managementHandler.ActivateOrderAsync(chatId, orderId, cancellationToken);
+            }
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
+        // Обработка отмены заказа
+        if (data.StartsWith("cancel_order_"))
+        {
+            var orderIdStr = data.Replace("cancel_order_", "");
+            if (int.TryParse(orderIdStr, out var orderId))
+            {
+                var managementHandler = scope.ServiceProvider.GetRequiredService<OrderManagementHandler>();
+                await managementHandler.CancelOrderAsync(chatId, userId, orderId, cancellationToken);
+            }
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+            return;
+        }
+
         if (data == "refresh_orders" || data == "back_to_orders")
         {
             await orderListHandler.ShowMyOrdersAsync(chatId, userId, cancellationToken);

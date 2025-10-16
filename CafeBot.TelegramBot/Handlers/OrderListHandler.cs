@@ -142,16 +142,37 @@ public class OrderListHandler
         // Кнопки действий в зависимости от статуса
         var buttons = new List<InlineKeyboardButton[]>();
 
-        if (order.Status == OrderStatus.Created || order.Status == OrderStatus.Confirmed)
+        if (order.Status == OrderStatus.Created)
         {
             buttons.Add(new[]
             {
-                InlineKeyboardButton.WithCallbackData("✅ Подтвердить", $"confirm_order_{orderId}"),
-                InlineKeyboardButton.WithCallbackData("❌ Отменить", $"cancel_order_{orderId}")
-            });
+        InlineKeyboardButton.WithCallbackData("✅ Подтвердить", $"confirm_order_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("🔥 Активировать", $"activate_order_{orderId}")
+    });
+            buttons.Add(new[]
+            {
+        InlineKeyboardButton.WithCallbackData("➕ Дозаказать", $"addmore_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("💰 К оплате", $"topayment_{orderId}")
+    });
+            buttons.Add(new[]
+            {
+        InlineKeyboardButton.WithCallbackData("❌ Отменить заказ", $"cancel_order_{orderId}")
+    });
         }
-
-        if (order.Status == OrderStatus.Created || order.Status == OrderStatus.Confirmed || order.Status == OrderStatus.Active)
+        else if (order.Status == OrderStatus.Confirmed)
+        {
+            buttons.Add(new[]
+            {
+        InlineKeyboardButton.WithCallbackData("🔥 Клиент пришёл", $"activate_order_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("➕ Дозаказать", $"addmore_{orderId}")
+    });
+            buttons.Add(new[]
+            {
+        InlineKeyboardButton.WithCallbackData("💰 К оплате", $"topayment_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("❌ Отменить", $"cancel_order_{orderId}")
+    });
+        }
+        else if (order.Status == OrderStatus.Active)
         {
             buttons.Add(new[]
             {
@@ -159,20 +180,23 @@ public class OrderListHandler
         InlineKeyboardButton.WithCallbackData("💰 К оплате", $"topayment_{orderId}")
     });
         }
-
-        if (order.Status == OrderStatus.ReadyToPay)
+        else if (order.Status == OrderStatus.ReadyToPay)
         {
             buttons.Add(new[]
             {
-                InlineKeyboardButton.WithCallbackData("💵 Оплата наличными", $"pay_cash_{orderId}"),
-                InlineKeyboardButton.WithCallbackData("💳 Оплата картой", $"pay_card_{orderId}")
-            });
+        InlineKeyboardButton.WithCallbackData("💵 Оплата наличными", $"pay_cash_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("💳 Оплата картой", $"pay_card_{orderId}")
+    });
+            buttons.Add(new[]
+            {
+        InlineKeyboardButton.WithCallbackData("📱 Перевод", $"pay_transfer_{orderId}")
+    });
         }
 
         buttons.Add(new[]
         {
-            InlineKeyboardButton.WithCallbackData("⬅️ К списку заказов", "back_to_orders")
-        });
+    InlineKeyboardButton.WithCallbackData("⬅️ К списку заказов", "back_to_orders")
+});
 
         var keyboard = new InlineKeyboardMarkup(buttons);
 
