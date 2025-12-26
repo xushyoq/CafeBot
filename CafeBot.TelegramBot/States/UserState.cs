@@ -26,5 +26,9 @@ public enum UserState
     AdminAddingEmployeeFirstName,
     AdminAddingEmployeeLastName,
     AdminAddingEmployeePhone,
-    AdminSelectingEmployeeRole
+    AdminSelectingEmployeeRole,
+
+    // Администрирование - Статистика
+    AdminSelectingStatisticsStartDate,
+    AdminSelectingStatisticsEndDate
 }

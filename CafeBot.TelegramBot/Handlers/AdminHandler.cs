@@ -55,6 +55,12 @@ public class AdminHandler
             case "admin_list_employees":
                 await ShowEmployeeList(chatId, cancellationToken);
                 break;
+            case "admin_employee_statistics":
+                await ShowStatisticsPeriodSelection(chatId, cancellationToken);
+                break;
+            case "admin_employee_status":
+                await ShowEmployeeCurrentStatus(chatId, cancellationToken);
+                break;
             case "admin_back_to_main":
                 await _botClient.EditMessageTextAsync(
                     chatId: chatId,
@@ -84,6 +90,10 @@ public class AdminHandler
                 if (data.StartsWith("set_employee_role_"))
                 {
                     await HandleSetEmployeeRoleCallback(userId, chatId, data, callbackQuery.Message.MessageId, cancellationToken);
+                }
+                else if (data.StartsWith("stats_period_"))
+                {
+                    await HandleStatisticsPeriodCallback(userId, chatId, data, cancellationToken);
                 }
                 break;
         }
@@ -128,6 +138,12 @@ public class AdminHandler
                 stateData.AdminEmployeePhone = messageText;
                 _userStateManager.SetState(userId, UserState.AdminSelectingEmployeeRole);
                 await RequestEmployeeRole(chatId, cancellationToken);
+                break;
+            case UserState.AdminSelectingStatisticsStartDate:
+                await HandleStatisticsStartDateInput(chatId, userId, messageText, cancellationToken);
+                break;
+            case UserState.AdminSelectingStatisticsEndDate:
+                await HandleStatisticsEndDateInput(chatId, userId, messageText, cancellationToken);
                 break;
             default:
                 await _botClient.SendTextMessageAsync(chatId, "Неизвестная команда. Пожалуйста, используйте кнопки.", replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(), cancellationToken: cancellationToken);
@@ -288,7 +304,213 @@ public class AdminHandler
             chatId: chatId,
             text: employeeList.ToString(),
             parseMode: ParseMode.Html,
-            replyMarkup: KeyboardBuilder.ManageEmployeesKeyboard(), 
+            replyMarkup: KeyboardBuilder.ManageEmployeesKeyboard(),
             cancellationToken: cancellationToken);
+    }
+
+    private async Task ShowStatisticsPeriodSelection(long chatId, CancellationToken cancellationToken)
+    {
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "📊 Выберите период для просмотра статистики сотрудников:",
+            replyMarkup: KeyboardBuilder.StatisticsPeriodKeyboard(),
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task HandleStatisticsPeriodCallback(long userId, long chatId, string callbackData, CancellationToken cancellationToken)
+    {
+        DateTime startDate, endDate;
+
+        switch (callbackData)
+        {
+            case "stats_period_today":
+                startDate = DateTime.Today.ToUniversalTime();
+                endDate = DateTime.Today.AddDays(1).ToUniversalTime();
+                break;
+            case "stats_period_week":
+                startDate = DateTime.Today.AddDays(-7).ToUniversalTime();
+                endDate = DateTime.Today.AddDays(1).ToUniversalTime();
+                break;
+            case "stats_period_month":
+                startDate = DateTime.Today.AddDays(-30).ToUniversalTime();
+                endDate = DateTime.Today.AddDays(1).ToUniversalTime();
+                break;
+            case "stats_period_custom":
+                await StartCustomPeriodSelection(chatId, userId, cancellationToken);
+                return;
+            default:
+                return;
+        }
+
+        await ShowEmployeeStatistics(chatId, startDate, endDate, cancellationToken);
+    }
+
+    private async Task StartCustomPeriodSelection(long chatId, long userId, CancellationToken cancellationToken)
+    {
+        _userStateManager.SetState(userId, UserState.AdminSelectingStatisticsStartDate);
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "📅 Введите дату НАЧАЛА периода в формате ДД.ММ.ГГГГ (например: 01.12.2025):",
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task HandleStatisticsStartDateInput(long chatId, long userId, string dateText, CancellationToken cancellationToken)
+    {
+        if (!DateTime.TryParseExact(dateText, "dd.MM.yyyy", null, System.Globalization.DateTimeStyles.AssumeLocal, out var startDate))
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Неверный формат даты. Введите дату в формате ДД.ММ.ГГГГ (например: 01.12.2025):",
+                cancellationToken: cancellationToken);
+            return;
+        }
+
+        var stateData = _userStateManager.GetStateData(userId);
+        stateData.AdminStatisticsStartDate = startDate.ToUniversalTime(); // Конвертация в UTC
+
+        _userStateManager.SetState(userId, UserState.AdminSelectingStatisticsEndDate);
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: $"✅ Дата начала: {startDate:dd.MM.yyyy}\n\n📅 Теперь введите дату КОНЦА периода в формате ДД.ММ.ГГГГ:",
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task HandleStatisticsEndDateInput(long chatId, long userId, string dateText, CancellationToken cancellationToken)
+    {
+        if (!DateTime.TryParseExact(dateText, "dd.MM.yyyy", null, System.Globalization.DateTimeStyles.AssumeLocal, out var endDate))
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Неверный формат даты. Введите дату в формате ДД.ММ.ГГГГ (например: 31.12.2025):",
+                cancellationToken: cancellationToken);
+            return;
+        }
+
+        var stateData = _userStateManager.GetStateData(userId);
+        if (!stateData.AdminStatisticsStartDate.HasValue)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Ошибка: дата начала не найдена. Начните заново.",
+                replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
+                cancellationToken: cancellationToken);
+            _userStateManager.ClearState(userId);
+            return;
+        }
+
+        var startDateUtc = stateData.AdminStatisticsStartDate.Value;
+        var startDateLocal = startDateUtc.ToLocalTime().Date; // Только дата без времени для корректного сравнения
+
+        if (endDate.Date <= startDateLocal)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "❌ Дата конца должна быть позже даты начала. Попробуйте еще раз:",
+                cancellationToken: cancellationToken);
+            return;
+        }
+
+        _userStateManager.ClearState(userId);
+        await ShowEmployeeStatistics(chatId, startDateUtc, endDate.ToUniversalTime(), cancellationToken); // Конвертация в UTC
+    }
+
+    private async Task ShowEmployeeStatistics(long chatId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var statistics = await _employeeService.GetEmployeesStatisticsAsync(startDate, endDate);
+
+            if (!statistics.Any())
+            {
+                await _botClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: $"📊 Статистика за период {startDate:dd.MM.yyyy} - {endDate:dd.MM.yyyy}\n\n❌ За выбранный период нет завершенных заказов.",
+                    replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
+                    cancellationToken: cancellationToken);
+                return;
+            }
+
+            var message = $"📊 Статистика сотрудников\n📅 Период: {startDate.ToLocalTime():dd.MM.yyyy} - {endDate.ToLocalTime():dd.MM.yyyy}\n\n";
+
+            var sortedStats = statistics.OrderByDescending(s => s.TotalRevenue).ToList();
+
+            for (int i = 0; i < sortedStats.Count; i++)
+            {
+                var stat = sortedStats[i];
+                var medal = i switch
+                {
+                    0 => "🥇",
+                    1 => "🥈",
+                    2 => "🥉",
+                    _ => "👤"
+                };
+
+                message += $"{medal} {stat.EmployeeName}\n";
+                message += $"   📋 Заказов: {stat.OrdersCount}\n";
+                message += $"   💰 Выручка: {stat.TotalRevenue:N0} сум\n\n";
+            }
+
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: message.Trim(),
+                replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: $"❌ Ошибка при получении статистики: {ex.Message}",
+                replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
+                cancellationToken: cancellationToken);
+        }
+    }
+
+    private async Task ShowEmployeeCurrentStatus(long chatId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var statusList = await _employeeService.GetEmployeesCurrentStatusAsync();
+
+            if (!statusList.Any())
+            {
+                await _botClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: "👀 Статус официантов\n\n❌ Нет активных официантов.",
+                    replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
+                    cancellationToken: cancellationToken);
+                return;
+            }
+
+            var message = "👀 Статус официантов\n\n";
+
+            foreach (var status in statusList.OrderBy(s => s.EmployeeName))
+            {
+                message += $"👨‍💼 {status.EmployeeName}\n";
+
+                if (status.Status == "Свободен")
+                {
+                    message += $"   ✅ Свободен\n\n";
+                }
+                else
+                {
+                    message += $"   🔄 {status.Status}\n\n";
+                }
+            }
+
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: message.Trim(),
+                replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: $"❌ Ошибка при получении статуса: {ex.Message}",
+                replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
+                cancellationToken: cancellationToken);
+        }
     }
 }

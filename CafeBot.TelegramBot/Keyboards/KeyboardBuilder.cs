@@ -45,6 +45,14 @@ public static class KeyboardBuilder
             },
             new[]
             {
+                InlineKeyboardButton.WithCallbackData("📊 Статистика сотрудников", "admin_employee_statistics")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("👀 Статус официантов", "admin_employee_status")
+            },
+            new[]
+            {
                 InlineKeyboardButton.WithCallbackData("📦 Управление продуктами", "admin_manage_products")
             },
             new[]
@@ -93,6 +101,27 @@ public static class KeyboardBuilder
             new[]
             {
                 InlineKeyboardButton.WithCallbackData("❌ Отмена", "admin_cancel")
+            }
+        });
+    }
+
+    public static InlineKeyboardMarkup StatisticsPeriodKeyboard()
+    {
+        return new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("📅 Сегодня", "stats_period_today"),
+                InlineKeyboardButton.WithCallbackData("📅 Неделя", "stats_period_week")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("📅 Месяц", "stats_period_month"),
+                InlineKeyboardButton.WithCallbackData("📅 Выбрать даты", "stats_period_custom")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("⬅️ Назад", "admin_back_to_admin_menu")
             }
         });
     }

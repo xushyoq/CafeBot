@@ -30,6 +30,10 @@ public class UserStateData
     public string? AdminEmployeePhone { get; set; }
     public EmployeeRole? AdminEmployeeRole { get; set; }
 
+    // Данные для администрирования - Статистика
+    public DateTime? AdminStatisticsStartDate { get; set; }
+    public DateTime? AdminStatisticsEndDate { get; set; }
+
     public void Clear()
     {
         SelectedDate = null;
@@ -50,6 +54,10 @@ public class UserStateData
         AdminEmployeeLastName = null;
         AdminEmployeePhone = null;
         AdminEmployeeRole = null;
+
+        // Очистка данных статистики
+        AdminStatisticsStartDate = null;
+        AdminStatisticsEndDate = null;
     }
 }
 
