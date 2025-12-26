@@ -14,4 +14,5 @@ public interface IOrderRepository : IRepository<Order>
     Task<IEnumerable<Order>> GetOrdersByEmployeeAndStatusAsync(int employeeId, OrderStatus[] statuses);
     Task<string> GenerateOrderNumberAsync();
     Task<bool> IsRoomAvailableAsync(int roomId, DateTime date, TimeSlot timeSlot);
+    Task<bool> HasActiveOrdersInRoomAsync(int roomId);
 }

@@ -1,0 +1,33 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Database=cafebot;Username=cafebotuser;Password=your_password_here"
+  },
+  "Telegram": {
+    "BotToken": "your_telegram_bot_token_here"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.EntityFrameworkCore": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    },
+    "Console": {
+      "IncludeScopes": true
+    }
+  },
+  "AllowedHosts": "*",
+  "HealthChecks": {
+    "Enabled": true,
+    "Path": "/health"
+  },
+  "Cache": {
+    "Enabled": false,
+    "ConnectionString": "localhost:6379",
+    "DefaultExpirationMinutes": 30
+  },
+  "RateLimiting": {
+    "Enabled": false,
+    "PermitLimit": 100,
+    "WindowSeconds": 60
+  }
+}

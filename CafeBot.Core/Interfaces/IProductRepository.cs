@@ -7,4 +7,5 @@ public interface IProductRepository : IRepository<Product>
     Task<IEnumerable<Product>> GetAvailableProductsAsync();
     Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId);
     Task<Product?> GetProductWithCategoryAsync(int productId);
+    Task<IEnumerable<Product>> GetAllProductsForAdminAsync();
 }

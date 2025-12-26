@@ -12,3 +12,6 @@ public class EmployeeCurrentStatus
     public TimeSlot? TimeSlot { get; set; }
 }
 
+
+
+

@@ -10,6 +10,8 @@ public interface IProductService
     Task<IEnumerable<Product>> GetAvailableProductsAsync();
     Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId);
     Task<Product?> GetProductByIdAsync(int productId);
+    Task<Product?> GetProductWithCategoryAsync(int productId);
+    Task<IEnumerable<Product>> GetAllProductsForAdminAsync();
     Task<IEnumerable<Category>> GetActiveCategoriesAsync();
 
     // CRUD операции с продуктами
@@ -48,6 +50,16 @@ public class ProductService : IProductService
     public async Task<Product?> GetProductByIdAsync(int productId)
     {
         return await _unitOfWork.Products.GetByIdAsync(productId);
+    }
+
+    public async Task<Product?> GetProductWithCategoryAsync(int productId)
+    {
+        return await _unitOfWork.Products.GetProductWithCategoryAsync(productId);
+    }
+
+    public async Task<IEnumerable<Product>> GetAllProductsForAdminAsync()
+    {
+        return await _unitOfWork.Products.GetAllProductsForAdminAsync();
     }
 
     public async Task<IEnumerable<Category>> GetActiveCategoriesAsync()
@@ -140,7 +152,17 @@ public class ProductService : IProductService
             return false;
         }
 
-        await _unitOfWork.Products.DeleteAsync(product.Id);
+        // Проверяем, используется ли продукт в активных заказах
+        var hasActiveOrderItems = await _unitOfWork.OrderItems.HasProductInActiveOrdersAsync(productId);
+        if (hasActiveOrderItems)
+        {
+            throw new InvalidOperationException("Нельзя удалить продукт, который используется в активных заказах. Сначала отмените или завершите все заказы с этим продуктом.");
+        }
+
+        // Soft delete вместо физического удаления
+        product.IsDeleted = true;
+        product.UpdatedAt = DateTime.UtcNow;
+
         await _unitOfWork.SaveChangesAsync();
         return true;
     }
@@ -205,6 +227,13 @@ public class ProductService : IProductService
         if (category == null)
         {
             return false;
+        }
+
+        // Проверяем, есть ли продукты в этой категории
+        var categoryWithProducts = await _unitOfWork.Categories.GetCategoryWithProductsAsync(categoryId);
+        if (categoryWithProducts?.Products.Any() == true)
+        {
+            throw new InvalidOperationException("Нельзя удалить категорию, в которой есть продукты. Сначала удалите все продукты из этой категории.");
         }
 
         await _unitOfWork.Categories.DeleteAsync(category.Id);

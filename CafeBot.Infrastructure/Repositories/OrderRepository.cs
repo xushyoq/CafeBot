@@ -103,4 +103,12 @@ public class OrderRepository : BaseRepository<Order>, IOrderRepository
             && o.Status != OrderStatus.Cancelled
             && o.Status != OrderStatus.Completed);
     }
+
+    public async Task<bool> HasActiveOrdersInRoomAsync(int roomId)
+    {
+        return await _dbSet.AnyAsync(o =>
+            o.RoomId == roomId
+            && o.Status != OrderStatus.Cancelled
+            && o.Status != OrderStatus.Completed);
+    }
 }

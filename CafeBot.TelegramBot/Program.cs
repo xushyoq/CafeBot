@@ -42,6 +42,10 @@ builder.Services.AddScoped<PaymentHandler>();
 builder.Services.AddScoped<OrderManagementHandler>();
 builder.Services.AddScoped<RoomHandler>();
 builder.Services.AddScoped<AdminHandler>();
+builder.Services.AddScoped<EmployeeAdminHandler>();
+builder.Services.AddScoped<ProductAdminHandler>();
+builder.Services.AddScoped<CategoryAdminHandler>();
+builder.Services.AddScoped<RoomAdminHandler>();
 builder.Services.AddScoped<BotUpdateHandler>(); // Добавлено
 
 // Регистрируем Telegram Bot Client

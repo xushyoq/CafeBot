@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: cafebot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cafebot
+      POSTGRES_USER: cafebotuser
+      POSTGRES_PASSWORD: CafeBot2025!Strong
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - cafebot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cafebotuser -d cafebot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # CafeBot Application
+  cafebot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cafebot-app
+    restart: unless-stopped
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=cafebot;Username=cafebotuser;Password=CafeBot2025!Strong"
+      Telegram__BotToken: "${TELEGRAM_BOT_TOKEN}"
+      ASPNETCORE_ENVIRONMENT: "Production"
+      Logging__LogLevel__Default: "Information"
+      Logging__LogLevel__Microsoft.EntityFrameworkCore: "Warning"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cafebot-network
+    volumes:
+      - ./logs:/app/logs
+
+  # Redis for caching (optional, for future use)
+  redis:
+    image: redis:7-alpine
+    container_name: cafebot-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cafebot-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  cafebot-network:
+    driver: bridge

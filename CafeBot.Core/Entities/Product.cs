@@ -12,6 +12,7 @@ public class Product
     public ProductUnit Unit { get; set; }
     public string? PhotoUrl { get; set; }
     public bool IsAvailable { get; set; } = true;
+    public bool IsDeleted { get; set; } = false;
     public int DisplayOrder { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

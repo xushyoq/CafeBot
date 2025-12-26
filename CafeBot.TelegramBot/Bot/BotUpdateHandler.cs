@@ -26,7 +26,23 @@ public class BotUpdateHandler : IUpdateHandler
         _serviceProvider = serviceProvider;
         _logger = logger;
         _stateManager = stateManager;
-        _employeeService = employeeService; 
+        _employeeService = employeeService;
+    }
+
+    private async Task<bool> ValidateAdminAccessAsync(long userId, ITelegramBotClient botClient, CallbackQuery callbackQuery, CancellationToken cancellationToken)
+    {
+        var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
+        if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
+        {
+            return true;
+        }
+
+        await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "❌ У вас нет прав доступа к админ-панели.", showAlert: true, cancellationToken: cancellationToken);
+        if (callbackQuery.Message != null)
+        {
+            await botClient.EditMessageReplyMarkupAsync(callbackQuery.Message.Chat.Id, callbackQuery.Message.MessageId, replyMarkup: null, cancellationToken: cancellationToken);
+        }
+        return false;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -163,75 +179,37 @@ public class BotUpdateHandler : IUpdateHandler
 
         _logger.LogInformation("Получен callback: {Data} от {UserId}", data, userId);
 
+        // Отвечаем на callback сразу, чтобы избежать таймаутов
+        try
+        {
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+        }
+        catch
+        {
+            // Игнорируем ошибки ответа на callback
+        }
+
         using var scope = _serviceProvider.CreateScope();
         var orderFlowHandler = scope.ServiceProvider.GetRequiredService<OrderFlowHandler>();
         var orderListHandler = scope.ServiceProvider.GetRequiredService<OrderListHandler>();
         var adminHandler = scope.ServiceProvider.GetRequiredService<AdminHandler>(); 
 
-        // Обработка callback-ов админ-панели
-        if (data.StartsWith("admin_"))
+        // Обработка всех callback-ов админ-панели
+        if (data.StartsWith("admin_") || data.StartsWith("set_employee_role_") || data.StartsWith("set_product_unit_") ||
+            data.StartsWith("delete_product_") || data.StartsWith("confirm_delete_product_") ||
+            data.StartsWith("delete_category_") || data.StartsWith("confirm_delete_category_") ||
+            data.StartsWith("delete_room_") || data.StartsWith("confirm_delete_room_") ||
+            data.StartsWith("stats_period_") || data.StartsWith("edit_") || data.StartsWith("toggle_"))
         {
-            var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
-            if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
+            if (!await ValidateAdminAccessAsync(userId, botClient, callbackQuery, cancellationToken))
             {
-                await adminHandler.HandleAdminCallbackQuery(callbackQuery, cancellationToken);
+                return;
             }
-            else
-            {
-                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "❌ У вас нет прав доступа к админ-панели.", showAlert: true, cancellationToken: cancellationToken);
-                // Возможно, обновить клавиатуру, чтобы скрыть админ-кнопку, если она была видна по ошибке
-                await botClient.EditMessageReplyMarkupAsync(chatId, callbackQuery.Message.MessageId, replyMarkup: null, cancellationToken: cancellationToken); 
-            }
+
+            await adminHandler.HandleAdminCallbackQuery(callbackQuery, cancellationToken);
             return;
         }
 
-        // Обработка callback-ов для установки роли сотрудника
-        if (data.StartsWith("set_employee_role_"))
-        {
-            var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
-            if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
-            {
-                await adminHandler.HandleAdminCallbackQuery(callbackQuery, cancellationToken);
-            }
-            else
-            {
-                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "❌ У вас нет прав доступа к админ-панели.", showAlert: true, cancellationToken: cancellationToken);
-                await botClient.EditMessageReplyMarkupAsync(chatId, callbackQuery.Message.MessageId, replyMarkup: null, cancellationToken: cancellationToken);
-            }
-            return;
-        }
-
-        // Обработка callback-ов для установки единицы измерения продукта
-        if (data.StartsWith("set_product_unit_"))
-        {
-            var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
-            if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
-            {
-                await adminHandler.HandleAdminCallbackQuery(callbackQuery, cancellationToken);
-            }
-            else
-            {
-                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "❌ У вас нет прав доступа к админ-панели.", showAlert: true, cancellationToken: cancellationToken);
-                await botClient.EditMessageReplyMarkupAsync(chatId, callbackQuery.Message.MessageId, replyMarkup: null, cancellationToken: cancellationToken);
-            }
-            return;
-        }
-
-        // Обработка callback-ов статистики
-        if (data.StartsWith("stats_period_"))
-        {
-            var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
-            if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
-            {
-                await adminHandler.HandleAdminCallbackQuery(callbackQuery, cancellationToken);
-            }
-            else
-            {
-                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "❌ У вас нет прав доступа к админ-панели.", showAlert: true, cancellationToken: cancellationToken);
-                await botClient.EditMessageReplyMarkupAsync(chatId, callbackQuery.Message.MessageId, replyMarkup: null, cancellationToken: cancellationToken);
-            }
-            return;
-        }
 
         // Обработка просмотра заказов
         if (data.StartsWith("vieworder_"))

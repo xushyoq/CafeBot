@@ -9,3 +9,6 @@ public class EmployeeStatistics
     public string Period { get; set; } = string.Empty;
 }
 
+
+
+

@@ -122,6 +122,13 @@ public class RoomService : IRoomService
             return false;
         }
 
+        // Проверяем, есть ли активные заказы в этой комнате
+        var hasActiveOrders = await _unitOfWork.Orders.HasActiveOrdersInRoomAsync(roomId);
+        if (hasActiveOrders)
+        {
+            throw new InvalidOperationException("Нельзя удалить комнату с активными заказами. Сначала завершите или отмените все заказы в этой комнате.");
+        }
+
         await _unitOfWork.Rooms.DeleteAsync(roomId);
         await _unitOfWork.SaveChangesAsync();
         return true;

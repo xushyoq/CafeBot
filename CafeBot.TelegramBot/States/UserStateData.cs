@@ -54,6 +54,11 @@ public class UserStateData
     public string? AdminRoomDescription { get; set; }
     public string? AdminRoomPhotoUrl { get; set; }
 
+    // ID редактируемых сущностей
+    public int? AdminEditingProductId { get; set; }
+    public int? AdminEditingCategoryId { get; set; }
+    public int? AdminEditingRoomId { get; set; }
+
     public void Clear()
     {
         SelectedDate = null;
@@ -98,6 +103,11 @@ public class UserStateData
         AdminRoomCapacity = null;
         AdminRoomDescription = null;
         AdminRoomPhotoUrl = null;
+
+        // Очистка ID редактируемых сущностей
+        AdminEditingProductId = null;
+        AdminEditingCategoryId = null;
+        AdminEditingRoomId = null;
     }
 }
 
