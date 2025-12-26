@@ -30,5 +30,25 @@ public enum UserState
 
     // Администрирование - Статистика
     AdminSelectingStatisticsStartDate,
-    AdminSelectingStatisticsEndDate
+    AdminSelectingStatisticsEndDate,
+
+    // Администрирование - Управление категориями
+    AdminAddingCategoryName,
+    AdminAddingCategoryDisplayOrder,
+
+    // Администрирование - Управление продуктами
+    AdminAddingProductCategory,
+    AdminAddingProductName,
+    AdminAddingProductDescription,
+    AdminAddingProductPrice,
+    AdminAddingProductUnit,
+    AdminAddingProductPhotoUrl,
+    AdminAddingProductDisplayOrder,
+
+    // Администрирование - Управление комнатами
+    AdminAddingRoomName,
+    AdminAddingRoomNumber,
+    AdminAddingRoomCapacity,
+    AdminAddingRoomDescription,
+    AdminAddingRoomPhotoUrl
 }

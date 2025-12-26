@@ -34,6 +34,26 @@ public class UserStateData
     public DateTime? AdminStatisticsStartDate { get; set; }
     public DateTime? AdminStatisticsEndDate { get; set; }
 
+    // Данные для администрирования - Управление категориями
+    public string? AdminCategoryName { get; set; }
+    public int? AdminCategoryDisplayOrder { get; set; }
+
+    // Данные для администрирования - Управление продуктами
+    public int? AdminProductCategoryId { get; set; }
+    public string? AdminProductName { get; set; }
+    public string? AdminProductDescription { get; set; }
+    public decimal? AdminProductPrice { get; set; }
+    public ProductUnit? AdminProductUnit { get; set; }
+    public string? AdminProductPhotoUrl { get; set; }
+    public int? AdminProductDisplayOrder { get; set; }
+
+    // Данные для администрирования - Управление комнатами
+    public string? AdminRoomName { get; set; }
+    public int? AdminRoomNumber { get; set; }
+    public int? AdminRoomCapacity { get; set; }
+    public string? AdminRoomDescription { get; set; }
+    public string? AdminRoomPhotoUrl { get; set; }
+
     public void Clear()
     {
         SelectedDate = null;
@@ -58,6 +78,26 @@ public class UserStateData
         // Очистка данных статистики
         AdminStatisticsStartDate = null;
         AdminStatisticsEndDate = null;
+
+        // Очистка данных управления категориями
+        AdminCategoryName = null;
+        AdminCategoryDisplayOrder = null;
+
+        // Очистка данных управления продуктами
+        AdminProductCategoryId = null;
+        AdminProductName = null;
+        AdminProductDescription = null;
+        AdminProductPrice = null;
+        AdminProductUnit = null;
+        AdminProductPhotoUrl = null;
+        AdminProductDisplayOrder = null;
+
+        // Очистка данных управления комнатами
+        AdminRoomName = null;
+        AdminRoomNumber = null;
+        AdminRoomCapacity = null;
+        AdminRoomDescription = null;
+        AdminRoomPhotoUrl = null;
     }
 }
 

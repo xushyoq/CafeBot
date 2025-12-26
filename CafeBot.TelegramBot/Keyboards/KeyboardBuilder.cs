@@ -195,4 +195,83 @@ public static class KeyboardBuilder
             InlineKeyboardButton.WithCallbackData("❌ Отменить", "cancel")
         });
     }
+
+    public static InlineKeyboardMarkup ManageProductsKeyboard()
+    {
+        return new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("➕ Добавить продукт", "admin_add_product")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("🗒️ Просмотреть продукты", "admin_list_products")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("⬅️ Назад в админ-панель", "admin_back_to_admin_menu")
+            }
+        });
+    }
+
+    public static InlineKeyboardMarkup ManageCategoriesKeyboard()
+    {
+        return new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("➕ Добавить категорию", "admin_add_category")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("🗒️ Просмотреть категории", "admin_list_categories")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("⬅️ Назад в админ-панель", "admin_back_to_admin_menu")
+            }
+        });
+    }
+
+    public static InlineKeyboardMarkup ProductUnitKeyboard()
+    {
+        return new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("шт (штуки)", $"set_product_unit_{ProductUnit.Piece}"),
+                InlineKeyboardButton.WithCallbackData("кг (килограммы)", $"set_product_unit_{ProductUnit.Kg}")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("г (граммы)", $"set_product_unit_{ProductUnit.Gram}"),
+                InlineKeyboardButton.WithCallbackData("л (литры)", $"set_product_unit_{ProductUnit.Liter}")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("мл (миллилитры)", $"set_product_unit_{ProductUnit.Ml}"),
+                InlineKeyboardButton.WithCallbackData("❌ Отмена", "admin_cancel")
+            }
+        });
+    }
+
+    public static InlineKeyboardMarkup ManageRoomsKeyboard()
+    {
+        return new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("➕ Добавить комнату", "admin_add_room")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("🗒️ Просмотреть комнаты", "admin_list_rooms")
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("⬅️ Назад в админ-панель", "admin_back_to_admin_menu")
+            }
+        });
+    }
 }

@@ -132,7 +132,7 @@ public class BotUpdateHandler : IUpdateHandler
 
         // Обрабатываем текстовый ввод в зависимости от состояния
         var currentState = _stateManager.GetState(userId);
-        if (currentState >= UserState.AdminAddingEmployeeTelegramId && currentState <= UserState.AdminSelectingStatisticsEndDate)
+        if (currentState >= UserState.AdminAddingEmployeeTelegramId && currentState <= UserState.AdminAddingRoomPhotoUrl)
         {
             await adminHandler.HandleAdminTextMessageAsync(message, cancellationToken);
             return;
@@ -187,6 +187,22 @@ public class BotUpdateHandler : IUpdateHandler
 
         // Обработка callback-ов для установки роли сотрудника
         if (data.StartsWith("set_employee_role_"))
+        {
+            var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
+            if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
+            {
+                await adminHandler.HandleAdminCallbackQuery(callbackQuery, cancellationToken);
+            }
+            else
+            {
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "❌ У вас нет прав доступа к админ-панели.", showAlert: true, cancellationToken: cancellationToken);
+                await botClient.EditMessageReplyMarkupAsync(chatId, callbackQuery.Message.MessageId, replyMarkup: null, cancellationToken: cancellationToken);
+            }
+            return;
+        }
+
+        // Обработка callback-ов для установки единицы измерения продукта
+        if (data.StartsWith("set_product_unit_"))
         {
             var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
             if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
