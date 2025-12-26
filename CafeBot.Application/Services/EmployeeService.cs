@@ -99,4 +99,91 @@ public class EmployeeService : IEmployeeService
         }
         return employee;
     }
+
+    public async Task<IEnumerable<EmployeeStatistics>> GetEmployeesStatisticsAsync(DateTime startDate, DateTime endDate)
+    {
+        // Получаем всех активных официантов
+        var employees = await GetActiveEmployeesAsync();
+        var waiters = employees.Where(e => e.Role == EmployeeRole.Waiter);
+
+        var result = new List<EmployeeStatistics>();
+
+        foreach (var employee in waiters)
+        {
+            // Получаем завершенные заказы сотрудника за период (Paid или Completed)
+            var completedOrders = await _unitOfWork.Orders.GetOrdersByEmployeeAndDateRangeAsync(
+                employee.Id, startDate, endDate,
+                new[] { OrderStatus.Paid, OrderStatus.Completed });
+
+            var ordersCount = completedOrders.Count();
+            var totalRevenue = completedOrders.Sum(o => o.TotalAmount);
+
+            result.Add(new EmployeeStatistics
+            {
+                EmployeeId = employee.Id,
+                EmployeeName = $"{employee.FirstName} {employee.LastName}",
+                OrdersCount = ordersCount,
+                TotalRevenue = totalRevenue,
+                Period = $"{startDate:dd.MM.yyyy} - {endDate:dd.MM.yyyy}"
+            });
+        }
+
+        // Сортируем по выручке (по убыванию)
+        return result.OrderByDescending(x => x.TotalRevenue);
+    }
+
+    public async Task<IEnumerable<EmployeeCurrentStatus>> GetEmployeesCurrentStatusAsync()
+    {
+        // Получаем всех активных официантов
+        var employees = await GetActiveEmployeesAsync();
+        var waiters = employees.Where(e => e.Role == EmployeeRole.Waiter);
+
+        var result = new List<EmployeeCurrentStatus>();
+
+        foreach (var employee in waiters)
+        {
+            // Получаем активные заказы сотрудника (Created, Confirmed, Active, ReadyToPay)
+            var activeOrders = await _unitOfWork.Orders.GetOrdersByEmployeeAndStatusAsync(
+                employee.Id,
+                new[] { OrderStatus.Created, OrderStatus.Confirmed, OrderStatus.Active, OrderStatus.ReadyToPay });
+
+            // Берем самый ранний активный заказ (если есть)
+            var currentOrder = activeOrders.OrderBy(o => o.CreatedAt).FirstOrDefault();
+
+            string status;
+            int? currentOrderId = null;
+            string? roomName = null;
+            TimeSlot? timeSlot = null;
+
+            if (currentOrder != null)
+            {
+                // Получаем информацию о комнате
+                var room = await _unitOfWork.Rooms.GetByIdAsync(currentOrder.RoomId);
+                roomName = room?.Name ?? $"Комната {currentOrder.RoomId}";
+                timeSlot = currentOrder.TimeSlot;
+                currentOrderId = currentOrder.Id;
+
+                // Форматируем статус
+                var timeSlotText = timeSlot == TimeSlot.Day ? "День" : "Вечер";
+                status = $"{roomName} ({timeSlotText})";
+            }
+            else
+            {
+                status = "Свободен";
+            }
+
+            result.Add(new EmployeeCurrentStatus
+            {
+                EmployeeId = employee.Id,
+                EmployeeName = $"{employee.FirstName} {employee.LastName}",
+                Status = status,
+                CurrentOrderId = currentOrderId,
+                RoomName = roomName,
+                TimeSlot = timeSlot
+            });
+        }
+
+        // Сортируем по имени
+        return result.OrderBy(x => x.EmployeeName);
+    }
 }

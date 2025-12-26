@@ -62,6 +62,27 @@ public class OrderRepository : BaseRepository<Order>, IOrderRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Order>> GetOrdersByEmployeeAndDateRangeAsync(int employeeId, DateTime startDate, DateTime endDate, OrderStatus[] statuses)
+    {
+        return await _dbSet
+            .Include(o => o.Room)
+            .Where(o => o.EmployeeId == employeeId
+                     && o.CreatedAt >= startDate
+                     && o.CreatedAt < endDate
+                     && statuses.Contains(o.Status))
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Order>> GetOrdersByEmployeeAndStatusAsync(int employeeId, OrderStatus[] statuses)
+    {
+        return await _dbSet
+            .Include(o => o.Room)
+            .Where(o => o.EmployeeId == employeeId && statuses.Contains(o.Status))
+            .OrderBy(o => o.CreatedAt)
+            .ToListAsync();
+    }
+
     public async Task<string> GenerateOrderNumberAsync()
     {
         var today = DateTime.UtcNow.Date;

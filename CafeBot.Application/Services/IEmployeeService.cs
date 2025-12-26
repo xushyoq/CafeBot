@@ -13,4 +13,6 @@ public interface IEmployeeService
     Task<Employee?> UpdateEmployeeAsync(int employeeId, string firstName, string lastName, string phone, EmployeeRole role, bool isActive);
     Task<bool> DeactivateEmployeeAsync(int employeeId);
     Task<Employee?> GetEmployeeWithOrdersAndPaymentsAsync(int employeeId);
+    Task<IEnumerable<EmployeeStatistics>> GetEmployeesStatisticsAsync(DateTime startDate, DateTime endDate);
+    Task<IEnumerable<EmployeeCurrentStatus>> GetEmployeesCurrentStatusAsync();
 }
