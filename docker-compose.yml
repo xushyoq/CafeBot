@@ -7,9 +7,9 @@ services:
     container_name: cafebot-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: cafebot
-      POSTGRES_USER: cafebotuser
-      POSTGRES_PASSWORD: CafeBot2025!Strong
+      POSTGRES_DB: ${DB_NAME:-cafebot}
+      POSTGRES_USER: ${DB_USER:-cafebotuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme123}
     ports:
       - "5432:5432"
     volumes:
@@ -31,11 +31,11 @@ services:
     container_name: cafebot-app
     restart: unless-stopped
     environment:
-      ConnectionStrings__DefaultConnection: "Host=postgres;Database=cafebot;Username=cafebotuser;Password=CafeBot2025!Strong"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=${DB_NAME:-cafebot};Username=${DB_USER:-cafebotuser};Password=${DB_PASSWORD:-changeme123}"
       Telegram__BotToken: "${TELEGRAM_BOT_TOKEN}"
       ASPNETCORE_ENVIRONMENT: "Production"
-      Logging__LogLevel__Default: "Information"
-      Logging__LogLevel__Microsoft.EntityFrameworkCore: "Warning"
+      Logging__LogLevel__Default: "${Logging__LogLevel__Default:-Information}"
+      Logging__LogLevel__Microsoft.EntityFrameworkCore: "${Logging__LogLevel__Microsoft.EntityFrameworkCore:-Warning}"
     depends_on:
       postgres:
         condition: service_healthy

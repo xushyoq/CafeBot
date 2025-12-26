@@ -79,8 +79,14 @@ dist/
 
 # Secrets and sensitive data
 secrets.json
+*.pem
+*.key
+*.p12
+*.pfx
+appsettings.json
 appsettings.*.json
 !appsettings.json.example
+!appsettings.Development.json
 
 # Entity Framework
 Migrations/*.Designer.cs
