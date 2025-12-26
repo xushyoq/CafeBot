@@ -19,5 +19,12 @@ public enum UserState
     // Работа с заказом
     ViewingOrderDetails,
     AddingItemsToExistingOrder,
-    ProcessingPayment
+    ProcessingPayment,
+
+    // Администрирование - Управление сотрудниками
+    AdminAddingEmployeeTelegramId,
+    AdminAddingEmployeeFirstName,
+    AdminAddingEmployeeLastName,
+    AdminAddingEmployeePhone,
+    AdminSelectingEmployeeRole
 }

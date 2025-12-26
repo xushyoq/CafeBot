@@ -9,20 +9,24 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using CafeBot.Core.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
+using CafeBot.Application.Services;
 
 namespace CafeBot.TelegramBot.Bot;
 
 public class BotUpdateHandler : IUpdateHandler
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger _logger;
+    private readonly ILogger<BotUpdateHandler> _logger; // Изменено на типизированный логгер
     private readonly IUserStateManager _stateManager;
+    private readonly IEmployeeService _employeeService; 
 
-    public BotUpdateHandler(IServiceProvider serviceProvider, ILogger logger, IUserStateManager stateManager)
+    public BotUpdateHandler(IServiceProvider serviceProvider, ILogger<BotUpdateHandler> logger, IUserStateManager stateManager, IEmployeeService employeeService)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
         _stateManager = stateManager;
+        _employeeService = employeeService; 
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -58,6 +62,8 @@ public class BotUpdateHandler : IUpdateHandler
         using var scope = _serviceProvider.CreateScope();
         var commandHandler = scope.ServiceProvider.GetRequiredService<CommandHandler>();
         var orderFlowHandler = scope.ServiceProvider.GetRequiredService<OrderFlowHandler>();
+        var roomHandler = scope.ServiceProvider.GetRequiredService<RoomHandler>();
+        var adminHandler = scope.ServiceProvider.GetRequiredService<AdminHandler>(); 
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
         // Проверяем команды
@@ -94,11 +100,7 @@ public class BotUpdateHandler : IUpdateHandler
 
         if (messageText == "🏠 Комнаты")
         {
-            await botClient.SendTextMessageAsync(
-                chatId: chatId,
-                text: "🏠 Функция просмотра комнат в разработке...",
-                cancellationToken: cancellationToken
-            );
+            await roomHandler.HandleRoomCommand(message, cancellationToken);
             return;
         }
 
@@ -107,9 +109,34 @@ public class BotUpdateHandler : IUpdateHandler
             await commandHandler.HandleCommandAsync(new Message { Text = "/help", Chat = message.Chat, From = message.From }, cancellationToken);
             return;
         }
+        
+        // Обработка кнопки "Админ панель"
+        if (messageText == "🔧 Админ панель")
+        {
+            var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
+            if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
+            {
+                await adminHandler.HandleAdminPanelCommand(message, cancellationToken);
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: "❌ У вас нет прав доступа к админ-панели.",
+                    replyMarkup: KeyboardBuilder.MainMenuKeyboard(), 
+                    cancellationToken: cancellationToken
+                );
+            }
+            return;
+        }
 
         // Обрабатываем текстовый ввод в зависимости от состояния
         var currentState = _stateManager.GetState(userId);
+        if (currentState >= UserState.AdminAddingEmployeeTelegramId && currentState <= UserState.AdminSelectingEmployeeRole)
+        {
+            await adminHandler.HandleAdminTextMessageAsync(message, cancellationToken);
+            return;
+        }
         if (currentState != UserState.None)
         {
             await orderFlowHandler.HandleTextMessageAsync(message, userId, cancellationToken);
@@ -139,6 +166,40 @@ public class BotUpdateHandler : IUpdateHandler
         using var scope = _serviceProvider.CreateScope();
         var orderFlowHandler = scope.ServiceProvider.GetRequiredService<OrderFlowHandler>();
         var orderListHandler = scope.ServiceProvider.GetRequiredService<OrderListHandler>();
+        var adminHandler = scope.ServiceProvider.GetRequiredService<AdminHandler>(); 
+
+        // Обработка callback-ов админ-панели
+        if (data.StartsWith("admin_"))
+        {
+            var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
+            if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
+            {
+                await adminHandler.HandleAdminCallbackQuery(callbackQuery, cancellationToken);
+            }
+            else
+            {
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "❌ У вас нет прав доступа к админ-панели.", showAlert: true, cancellationToken: cancellationToken);
+                // Возможно, обновить клавиатуру, чтобы скрыть админ-кнопку, если она была видна по ошибке
+                await botClient.EditMessageReplyMarkupAsync(chatId, callbackQuery.Message.MessageId, replyMarkup: null, cancellationToken: cancellationToken); 
+            }
+            return;
+        }
+
+        // Обработка callback-ов для установки роли сотрудника
+        if (data.StartsWith("set_employee_role_"))
+        {
+            var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
+            if (employee?.Role == EmployeeRole.Admin && employee.IsActive)
+            {
+                await adminHandler.HandleAdminCallbackQuery(callbackQuery, cancellationToken);
+            }
+            else
+            {
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "❌ У вас нет прав доступа к админ-панели.", showAlert: true, cancellationToken: cancellationToken);
+                await botClient.EditMessageReplyMarkupAsync(chatId, callbackQuery.Message.MessageId, replyMarkup: null, cancellationToken: cancellationToken);
+            }
+            return;
+        }
 
         // Обработка просмотра заказов
         if (data.StartsWith("vieworder_"))

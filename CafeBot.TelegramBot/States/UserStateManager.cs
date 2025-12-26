@@ -17,7 +17,7 @@ public class UserStateManager : IUserStateManager
         _states[userId] = state;
     }
 
-    public UserStateData GetData(long userId)
+    public UserStateData GetStateData(long userId) // Переименовано GetData в GetStateData
     {
         return _data.GetOrAdd(userId, _ => new UserStateData());
     }
@@ -30,6 +30,11 @@ public class UserStateManager : IUserStateManager
     public void ClearState(long userId)
     {
         _states.TryRemove(userId, out _);
+        _data.TryRemove(userId, out _);
+    }
+
+    public void ClearStateData(long userId) // Добавлен новый метод
+    {
         _data.TryRemove(userId, out _);
     }
 }

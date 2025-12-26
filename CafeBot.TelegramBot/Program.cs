@@ -29,6 +29,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 // Регистрируем State Manager (Singleton!)
 builder.Services.AddSingleton<IUserStateManager, UserStateManager>();
@@ -39,6 +40,9 @@ builder.Services.AddScoped<OrderFlowHandler>();
 builder.Services.AddScoped<OrderListHandler>();
 builder.Services.AddScoped<PaymentHandler>();
 builder.Services.AddScoped<OrderManagementHandler>();
+builder.Services.AddScoped<RoomHandler>();
+builder.Services.AddScoped<AdminHandler>();
+builder.Services.AddScoped<BotUpdateHandler>(); // Добавлено
 
 // Регистрируем Telegram Bot Client
 var botToken = builder.Configuration["Telegram:BotToken"] 

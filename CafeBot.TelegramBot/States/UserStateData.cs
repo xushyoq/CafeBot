@@ -23,6 +23,13 @@ public class UserStateData
     // Временное хранилище для корзины (до создания заказа)
     public List<OrderItemData> Cart { get; set; } = new();
 
+    // Данные для администрирования - Управление сотрудниками
+    public long? AdminEmployeeTelegramId { get; set; }
+    public string? AdminEmployeeFirstName { get; set; }
+    public string? AdminEmployeeLastName { get; set; }
+    public string? AdminEmployeePhone { get; set; }
+    public EmployeeRole? AdminEmployeeRole { get; set; }
+
     public void Clear()
     {
         SelectedDate = null;
@@ -36,6 +43,13 @@ public class UserStateData
         Quantity = null;
         CurrentOrderId = null;
         Cart.Clear();
+
+        // Очистка данных администратора
+        AdminEmployeeTelegramId = null;
+        AdminEmployeeFirstName = null;
+        AdminEmployeeLastName = null;
+        AdminEmployeePhone = null;
+        AdminEmployeeRole = null;
     }
 }
 

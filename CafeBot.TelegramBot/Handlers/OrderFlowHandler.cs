@@ -43,7 +43,7 @@ public class OrderFlowHandler
     {
         _stateManager.SetState(userId, UserState.SelectingDate);
 
-        var data = _stateManager.GetData(userId);
+        var data = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         data.Clear();
 
         await _botClient.SendTextMessageAsync(
@@ -165,7 +165,7 @@ public class OrderFlowHandler
         // ВАЖНО: Конвертируем в UTC для PostgreSQL
         selectedDate = DateTime.SpecifyKind(selectedDate, DateTimeKind.Utc);
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         stateData.SelectedDate = selectedDate;
 
         _stateManager.SetState(userId, UserState.SelectingTimeSlot);
@@ -210,7 +210,7 @@ public class OrderFlowHandler
             return;
         }
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         stateData.SelectedTimeSlot = timeSlot;
 
         _stateManager.SetState(userId, UserState.SelectingRoom);
@@ -268,7 +268,7 @@ public class OrderFlowHandler
         if (!int.TryParse(roomIdStr, out var roomId))
             return;
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         stateData.SelectedRoomId = roomId;
 
         var room = await _roomService.GetRoomByIdAsync(roomId);
@@ -278,7 +278,7 @@ public class OrderFlowHandler
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
             text: $"✅ Комната: {room?.Name}\n\n" +
-                  "👤 Введите имя клиента:",
+   "👤 Введите имя клиента:",
             replyMarkup: KeyboardBuilder.CancelButton(),
             cancellationToken: cancellationToken
         );
@@ -293,7 +293,7 @@ public class OrderFlowHandler
         if (!int.TryParse(categoryIdStr, out var categoryId))
             return;
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         stateData.SelectedCategoryId = categoryId;
 
         _stateManager.SetState(userId, UserState.SelectingProduct);
@@ -341,7 +341,7 @@ public class OrderFlowHandler
         if (!int.TryParse(productIdStr, out var productId))
             return;
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         stateData.SelectedProductId = productId;
 
         var product = await _productService.GetProductByIdAsync(productId);
@@ -444,7 +444,7 @@ public class OrderFlowHandler
             return;
         }
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         stateData.ClientName = name;
 
         _stateManager.SetState(userId, UserState.EnteringClientPhone);
@@ -469,7 +469,7 @@ public class OrderFlowHandler
             return;
         }
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         stateData.ClientPhone = phone;
 
         _stateManager.SetState(userId, UserState.EnteringGuestCount);
@@ -494,7 +494,7 @@ public class OrderFlowHandler
             return;
         }
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         stateData.GuestCount = count;
 
         // Переходим к выбору блюд
@@ -513,7 +513,7 @@ public class OrderFlowHandler
             return;
         }
 
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
         var product = await _productService.GetProductByIdAsync(stateData.SelectedProductId!.Value);
 
         if (product == null)
@@ -590,7 +590,7 @@ public class OrderFlowHandler
 
     private async Task FinishOrderCreationAsync(long chatId, long userId, CancellationToken cancellationToken)
     {
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
 
         if (stateData.Cart.Count == 0)
         {
@@ -728,7 +728,7 @@ public class OrderFlowHandler
     }
 
     // Сохраняем ID заказа в state
-    var stateData = _stateManager.GetData(userId);
+    var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
     stateData.Clear();
     stateData.CurrentOrderId = orderId;
 
@@ -774,7 +774,7 @@ public class OrderFlowHandler
 
     private async Task FinishAddingItemsAsync(long chatId, long userId, CancellationToken cancellationToken)
     {
-        var stateData = _stateManager.GetData(userId);
+        var stateData = _stateManager.GetStateData(userId); // Исправлено GetData на GetStateData
 
         if (stateData.CurrentOrderId == null)
         {

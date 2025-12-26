@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
+using CafeBot.Application.Services; 
 
 namespace CafeBot.TelegramBot.Bot;
 
@@ -41,7 +42,9 @@ public class BotBackgroundService : BackgroundService
             }
         };
 
-        var updateHandler = new BotUpdateHandler(_serviceProvider, _logger, _stateManager);
+        // Создаем отдельный scope для BotUpdateHandler
+        using var scope = _serviceProvider.CreateScope();
+        var updateHandler = scope.ServiceProvider.GetRequiredService<BotUpdateHandler>();
 
         await _botClient.ReceiveAsync(
             updateHandler: updateHandler,
