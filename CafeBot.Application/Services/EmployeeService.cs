@@ -169,7 +169,7 @@ public class EmployeeService : IEmployeeService
             }
             else
             {
-                status = "Свободен";
+                status = "Bo'sh";
             }
 
             result.Add(new EmployeeCurrentStatus

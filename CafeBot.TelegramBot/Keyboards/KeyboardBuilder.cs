@@ -49,23 +49,23 @@ public static class KeyboardBuilder
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("👀 Статус ofitsiantов", "admin_employee_status")
+                InlineKeyboardButton.WithCallbackData("👀 Ofitsiantlar holati", "admin_employee_status")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("📦 Управление продуктами", "admin_manage_products")
+                InlineKeyboardButton.WithCallbackData("📦 Mahsulotlarni boshqarish", "admin_manage_products")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("📁 Управление категориями", "admin_manage_categories")
+                InlineKeyboardButton.WithCallbackData("📁 Kategoriyalarni boshqarish", "admin_manage_categories")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("🏢 Управление комнатами", "admin_manage_rooms")
+                InlineKeyboardButton.WithCallbackData("🏢 Xonalarni boshqarish", "admin_manage_rooms")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ Назад в главное меню", "admin_back_to_main")
+                InlineKeyboardButton.WithCallbackData("⬅️ Asosiy menyuga orqaga", "admin_back_to_main")
             }
         });
     }
@@ -76,15 +76,15 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Qo'shish сотрудника", "admin_add_employee")
+                InlineKeyboardButton.WithCallbackData("➕ Xodim qo'shish", "admin_add_employee")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("🗒️ Просмотреть сотрудников", "admin_list_employees")
+                InlineKeyboardButton.WithCallbackData("🗒️ Xodimlarni ko'rish", "admin_list_employees")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ Назад в админ-панель", "admin_back_to_admin_menu")
+                InlineKeyboardButton.WithCallbackData("⬅️ Admin paneliga orqaga", "admin_back_to_admin_menu")
             }
         });
     }
@@ -111,17 +111,17 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("📅 Сегодня", "stats_period_today"),
-                InlineKeyboardButton.WithCallbackData("📅 Неделя", "stats_period_week")
+                InlineKeyboardButton.WithCallbackData("📅 Bugun", "stats_period_today"),
+                InlineKeyboardButton.WithCallbackData("📅 Hafta", "stats_period_week")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("📅 Месяц", "stats_period_month"),
-                InlineKeyboardButton.WithCallbackData("📅 Выбрать даты", "stats_period_custom")
+                InlineKeyboardButton.WithCallbackData("📅 Oy", "stats_period_month"),
+                InlineKeyboardButton.WithCallbackData("📅 Sanalarni tanlash", "stats_period_custom")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ Назад", "admin_back_to_admin_menu")
+                InlineKeyboardButton.WithCallbackData("⬅️ Orqaga", "admin_back_to_admin_menu")
             }
         });
     }
@@ -132,8 +132,8 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("✅ Да", $"{callbackPrefix}_yes_{entityId}"),
-                InlineKeyboardButton.WithCallbackData("❌ Нет", $"{callbackPrefix}_no_{entityId}")
+                InlineKeyboardButton.WithCallbackData("✅ Ha", $"{callbackPrefix}_yes_{entityId}"),
+                InlineKeyboardButton.WithCallbackData("❌ Yo'q", $"{callbackPrefix}_no_{entityId}")
             }
         });
     }
@@ -148,11 +148,11 @@ public static class KeyboardBuilder
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData($"📅 Сегодня ({today:dd.MM})", $"date_{today:yyyy-MM-dd}")
+            InlineKeyboardButton.WithCallbackData($"📅 Bugun ({today:dd.MM})", $"date_{today:yyyy-MM-dd}")
         },
         new[]
         {
-            InlineKeyboardButton.WithCallbackData($"📅 Завтра ({tomorrow:dd.MM})", $"date_{tomorrow:yyyy-MM-dd}")
+            InlineKeyboardButton.WithCallbackData($"📅 Ertaga ({tomorrow:dd.MM})", $"date_{tomorrow:yyyy-MM-dd}")
         },
         new[]
         {
@@ -167,15 +167,15 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("☀️ День (12:00-16:00)", "timeslot_day")
+                InlineKeyboardButton.WithCallbackData("☀️ Kun (12:00-16:00)", "timeslot_day")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("🌙 Вечер (17:00-22:00)", "timeslot_evening")
+                InlineKeyboardButton.WithCallbackData("🌙 Kechqurun (17:00-22:00)", "timeslot_evening")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ Назад", "back_to_date")
+                InlineKeyboardButton.WithCallbackData("⬅️ Orqaga", "back_to_date")
             }
         });
     }
@@ -184,7 +184,7 @@ public static class KeyboardBuilder
     {
         return new InlineKeyboardMarkup(new[]
         {
-            InlineKeyboardButton.WithCallbackData("⬅️ Назад", "back")
+            InlineKeyboardButton.WithCallbackData("⬅️ Orqaga", "back")
         });
     }
 
@@ -192,7 +192,7 @@ public static class KeyboardBuilder
     {
         return new InlineKeyboardMarkup(new[]
         {
-            InlineKeyboardButton.WithCallbackData("❌ Отменить", "cancel")
+            InlineKeyboardButton.WithCallbackData("❌ Bekor qilish", "cancel")
         });
     }
 
@@ -202,15 +202,15 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Qo'shish продукт", "admin_add_product")
+                InlineKeyboardButton.WithCallbackData("➕ Mahsulot qo'shish", "admin_add_product")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("🗒️ Просмотреть продукты", "admin_list_products")
+                InlineKeyboardButton.WithCallbackData("🗒️ Mahsulotlarni ko'rish", "admin_list_products")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ Назад в админ-панель", "admin_back_to_admin_menu")
+                InlineKeyboardButton.WithCallbackData("⬅️ Admin paneliga orqaga", "admin_back_to_admin_menu")
             }
         });
     }
@@ -221,15 +221,15 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Qo'shish категорию", "admin_add_category")
+                InlineKeyboardButton.WithCallbackData("➕ Kategoriya qo'shish", "admin_add_category")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("🗒️ Просмотреть категории", "admin_list_categories")
+                InlineKeyboardButton.WithCallbackData("🗒️ Kategoriyalarni ko'rish", "admin_list_categories")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ Назад в админ-панель", "admin_back_to_admin_menu")
+                InlineKeyboardButton.WithCallbackData("⬅️ Admin paneliga orqaga", "admin_back_to_admin_menu")
             }
         });
     }
@@ -262,15 +262,15 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Qo'shish комнату", "admin_add_room")
+                InlineKeyboardButton.WithCallbackData("➕ Xona qo'shish", "admin_add_room")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("🗒️ Просмотреть комнаты", "admin_list_rooms")
+                InlineKeyboardButton.WithCallbackData("🗒️ Xonalarni ko'rish", "admin_list_rooms")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ Назад в админ-панель", "admin_back_to_admin_menu")
+                InlineKeyboardButton.WithCallbackData("⬅️ Admin paneliga orqaga", "admin_back_to_admin_menu")
             }
         });
     }

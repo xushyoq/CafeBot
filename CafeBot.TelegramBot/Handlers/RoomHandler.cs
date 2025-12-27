@@ -34,13 +34,13 @@ public class RoomHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "В данный момент нет доступных комнат.",
+                text: "Hozirda mavjud xonalar yo'q.",
                 cancellationToken: cancellationToken);
             return;
         }
 
         var roomList = new System.Text.StringBuilder();
-        roomList.AppendLine("Список комнат:");
+        roomList.AppendLine("Xonalar ro'yxati:");
         roomList.AppendLine();
 
         foreach (var room in rooms)
@@ -50,9 +50,9 @@ public class RoomHandler
                 RoomStatus.Active => "✅ Активна",
                 RoomStatus.Inactive => "❌ Неактивна",
                 RoomStatus.Maintenance => "🛠️ На обслуживании",
-                _ => "Неизвестно"
+                _ => "Noma'lum"
             }}");
-            roomList.AppendLine($"  Tavsif: {room.Description ?? "Нет описания"}");
+            roomList.AppendLine($"  Tavsif: {room.Description ?? "Tavsif yo'q"}");
             roomList.AppendLine();
         }
 

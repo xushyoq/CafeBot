@@ -25,7 +25,7 @@ public class EmployeeAdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Управление сотрудниками:",
+            text: "Xodimlarni boshqarish:",
             replyMarkup: KeyboardBuilder.ManageEmployeesKeyboard(),
             cancellationToken: cancellationToken);
     }
@@ -36,7 +36,7 @@ public class EmployeeAdminHandler
         _userStateManager.ClearStateData(userId); // Clear previous data for new employee
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите Telegram ID нового сотрудника (только цифры):",
+            text: "Yangi xodimning Telegram ID sini kiriting (faqat raqamlar):",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -45,7 +45,7 @@ public class EmployeeAdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите имя сотрудника:",
+            text: "Xodimning ismini kiriting:",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -54,7 +54,7 @@ public class EmployeeAdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите фамилию сотрудника:",
+            text: "Xodimning familiyasini kiriting:",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -63,7 +63,7 @@ public class EmployeeAdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите номер телефона сотрудника (например, +79123456789):",
+            text: "Xodimning telefon raqamini kiriting (masalan, +998901234567):",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -72,7 +72,7 @@ public class EmployeeAdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Выберите роль для сотрудника:",
+            text: "Xodim uchun rolni tanlang:",
             replyMarkup: KeyboardBuilder.EmployeeRolesKeyboard(),
             cancellationToken: cancellationToken);
     }
@@ -106,7 +106,7 @@ public class EmployeeAdminHandler
                 await _botClient.EditMessageTextAsync(
                     chatId: chatId,
                     messageId: messageId,
-                    text: $"❌ Сотрудник с Telegram ID {stateData.AdminEmployeeTelegramId.Value} уже существует.",
+                    text: $"❌ Telegram ID {stateData.AdminEmployeeTelegramId.Value} bo'lgan xodim allaqachon mavjud.",
                     replyMarkup: KeyboardBuilder.ManageEmployeesKeyboard(),
                     cancellationToken: cancellationToken);
                 _userStateManager.ClearState(userId);
@@ -124,7 +124,7 @@ public class EmployeeAdminHandler
             await _botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId,
-                text: $"✅ Сотрудник {newEmployee.FirstName} {newEmployee.LastName} ({newEmployee.Role}) успешно добавлен!",
+                text: $"✅ Xodim {newEmployee.FirstName} {newEmployee.LastName} ({newEmployee.Role}) muvaffaqiyatli qo'shildi!",
                 replyMarkup: KeyboardBuilder.ManageEmployeesKeyboard(),
                 cancellationToken: cancellationToken);
 
@@ -135,7 +135,7 @@ public class EmployeeAdminHandler
             await _botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId,
-                text: "Ошибка при создании сотрудника. Не все данные заполнены.",
+                text: "Xodimni yaratishda xatolik. Barcha ma'lumotlar to'ldirilmagan.",
                 replyMarkup: KeyboardBuilder.ManageEmployeesKeyboard(),
                 cancellationToken: cancellationToken);
             _userStateManager.ClearState(userId);
@@ -150,23 +150,23 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "В данный момент нет зарегистрированных сотрудников.",
+                text: "Hozirda ro'yxatdan o'tgan xodimlar yo'q.",
                 replyMarkup: KeyboardBuilder.ManageEmployeesKeyboard(),
                 cancellationToken: cancellationToken);
             return;
         }
 
         var employeeList = new System.Text.StringBuilder();
-        employeeList.AppendLine("Список сотрудников:");
+        employeeList.AppendLine("Xodimlar ro'yxati:");
         employeeList.AppendLine();
 
         foreach (var employee in employees)
         {
             employeeList.AppendLine($"👨‍💼 ID: {employee.Id}, Telegram ID: {employee.TelegramId}");
-            employeeList.AppendLine($"  Имя: {employee.FirstName} {employee.LastName}");
-            employeeList.AppendLine($"  Телефон: {employee.Phone}");
-            employeeList.AppendLine($"  Роль: {employee.Role}");
-            employeeList.AppendLine($"  Активен: {(employee.IsActive ? "✅ Да" : "❌ Нет")}");
+            employeeList.AppendLine($"  Ism: {employee.FirstName} {employee.LastName}");
+            employeeList.AppendLine($"  Telefon: {employee.Phone}");
+            employeeList.AppendLine($"  Rol: {employee.Role}");
+            employeeList.AppendLine($"  Faol: {(employee.IsActive ? "✅ Ha" : "❌ Yo'q")}");
             employeeList.AppendLine();
         }
 
@@ -182,7 +182,7 @@ public class EmployeeAdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "📊 Выберите период для просмотра статистики сотрудников:",
+            text: "📊 Xodimlar statistikasini ko'rish uchun davrni tanlang:",
             replyMarkup: KeyboardBuilder.StatisticsPeriodKeyboard(),
             cancellationToken: cancellationToken);
     }
@@ -220,7 +220,7 @@ public class EmployeeAdminHandler
         _userStateManager.SetState(userId, UserState.AdminSelectingStatisticsStartDate);
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "📅 Введите дату НАЧАЛА периода в формате ДД.ММ.ГГГГ (например: 01.12.2025):",
+            text: "📅 Davr BOSHLANISH sanasini DD.MM.YYYY formatda kiriting (masalan: 01.12.2025):",
             cancellationToken: cancellationToken);
     }
 
@@ -230,7 +230,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Noto'g'ri format даты. Введите дату в формате ДД.ММ.ГГГГ (например: 01.12.2025):",
+                text: "❌ Sana formati noto'g'ri. Sanani DD.MM.YYYY formatda kiriting (masalan: 01.12.2025):",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -241,7 +241,7 @@ public class EmployeeAdminHandler
         _userStateManager.SetState(userId, UserState.AdminSelectingStatisticsEndDate);
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Дата начала: {startDate:dd.MM.yyyy}\n\n📅 Теперь введите дату КОНЦА периода в формате ДД.ММ.ГГГГ:",
+            text: $"✅ Boshlanish sanasi: {startDate:dd.MM.yyyy}\n\n📅 Endi davr OXIR sanasini DD.MM.YYYY formatda kiriting:",
             cancellationToken: cancellationToken);
     }
 
@@ -251,7 +251,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Noto'g'ri format даты. Введите дату в формате ДД.ММ.ГГГГ (например: 31.12.2025):",
+                text: "❌ Sana formati noto'g'ri. Sanani DD.MM.YYYY formatda kiriting (masalan: 31.12.2025):",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -261,7 +261,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Ошибка: дата начала не найдена. Начните заново.",
+                text: "❌ Xatolik: boshlanish sanasi topilmadi. Qaytadan boshlang.",
                 replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
                 cancellationToken: cancellationToken);
             _userStateManager.ClearState(userId);
@@ -275,7 +275,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Дата конца должна быть позже даты начала. Qaytadan urinib ko'ring:",
+                text: "❌ Oxir sanasi boshlanish sanasidan keyinroq bo'lishi kerak. Qaytadan urinib ko'ring:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -294,13 +294,13 @@ public class EmployeeAdminHandler
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: $"📊 Статистика за период {startDate:dd.MM.yyyy} - {endDate:dd.MM.yyyy}\n\n❌ За выбранный период нет завершенных заказов.",
+                    text: $"📊 {startDate:dd.MM.yyyy} - {endDate:dd.MM.yyyy} davri uchun statistika\n\n❌ Tanlangan davrda tugagan buyurtmalar yo'q.",
                     replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
                     cancellationToken: cancellationToken);
                 return;
             }
 
-            var message = $"📊 Статистика сотрудников\n📅 Период: {startDate.ToLocalTime():dd.MM.yyyy} - {endDate.ToLocalTime():dd.MM.yyyy}\n\n";
+            var message = $"📊 Xodimlar statistikasi\n📅 Davr: {startDate.ToLocalTime():dd.MM.yyyy} - {endDate.ToLocalTime():dd.MM.yyyy}\n\n";
 
             var sortedStats = statistics.OrderByDescending(s => s.TotalRevenue).ToList();
 
@@ -316,8 +316,8 @@ public class EmployeeAdminHandler
                 };
 
                 message += $"{medal} {stat.EmployeeName}\n";
-                message += $"   📋 Заказов: {stat.OrdersCount}\n";
-                message += $"   💰 Выручка: {stat.TotalRevenue:N0} сум\n\n";
+                message += $"   📋 Buyurtmalar: {stat.OrdersCount}\n";
+                message += $"   💰 Daromad: {stat.TotalRevenue:N0} so'm\n\n";
             }
 
             await _botClient.SendTextMessageAsync(
@@ -330,7 +330,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при получении статистики: {ex.Message}",
+                text: $"❌ Statistika olishda xatolik: {ex.Message}",
                 replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
                 cancellationToken: cancellationToken);
         }
@@ -346,21 +346,21 @@ public class EmployeeAdminHandler
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "👀 Статус ofitsiantов\n\n❌ Нет активных ofitsiantов.",
+                    text: "👀 Ofitsiantlar holati\n\n❌ Faol ofitsiantlar yo'q.",
                     replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
                     cancellationToken: cancellationToken);
                 return;
             }
 
-            var message = "👀 Статус ofitsiantов\n\n";
+            var message = "👀 Ofitsiantlar holati\n\n";
 
             foreach (var status in statusList.OrderBy(s => s.EmployeeName))
             {
                 message += $"👨‍💼 {status.EmployeeName}\n";
 
-                if (status.Status == "Свободен")
+                if (status.Status == "Svobod")
                 {
-                    message += $"   ✅ Свободен\n\n";
+                    message += $"   ✅ Bo'sh\n\n";
                 }
                 else
                 {
@@ -378,7 +378,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при получении статуса: {ex.Message}",
+                text: $"❌ Holat olishda xatolik: {ex.Message}",
                 replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
                 cancellationToken: cancellationToken);
         }
@@ -440,7 +440,7 @@ public class EmployeeAdminHandler
                 }
                 else
                 {
-                    await _botClient.SendTextMessageAsync(chatId, "Пожалуйста, введите корректный Telegram ID (только цифры).");
+                    await _botClient.SendTextMessageAsync(chatId, "Iltimos, to'g'ri Telegram ID kiriting (faqat raqamlar).");
                 }
                 break;
             case UserState.AdminAddingEmployeeFirstName:

@@ -126,7 +126,7 @@ public class OrderFlowHandler
                 default:
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "❓ Неизвестное действие. Начните заново с /start",
+                        text: "❓ Noma'lum harakat. Qaytadan /start bilan boshlang",
                         cancellationToken: cancellationToken
                     );
                     break;
@@ -156,7 +156,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Noto'g'ri format даты. Qaytadan urinib ko'ring.",
+                text: "❌ Sana formati noto'g'ri. Qaytadan urinib ko'ring.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -172,7 +172,7 @@ public class OrderFlowHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Дата: {selectedDate:dd.MM.yyyy}\n\n⏰ Выберите время:",
+            text: $"✅ Sana: {selectedDate:dd.MM.yyyy}\n\n⏰ Vaqtni tanlang:",
             replyMarkup: KeyboardBuilder.TimeSlotSelectionKeyboard(),
             cancellationToken: cancellationToken
         );
@@ -185,7 +185,7 @@ public class OrderFlowHandler
             _stateManager.SetState(userId, UserState.SelectingDate);
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "📅 Выберите дату бронирования:",
+                text: "📅 Bron qilish sanasini tanlang:",
                 replyMarkup: KeyboardBuilder.DateSelectionKeyboard(),
                 cancellationToken: cancellationToken
             );
@@ -198,12 +198,12 @@ public class OrderFlowHandler
         if (data == "timeslot_day")
         {
             timeSlot = TimeSlot.Day;
-            timeSlotText = "День (12:00-16:00)";
+            timeSlotText = "Kun (12:00-16:00)";
         }
         else if (data == "timeslot_evening")
         {
             timeSlot = TimeSlot.Evening;
-            timeSlotText = "Вечер (17:00-22:00)";
+            timeSlotText = "Kechqurun (17:00-22:00)";
         }
         else
         {
@@ -225,7 +225,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ К сожалению, все комнаты заняты на это время.\n\nПопробуйте выбрать другую дату или время.",
+                text: "❌ Afsuski, barcha xonalar bu vaqtda band.\n\nBoshqa sana yoki vaqtni tanlang.",
                 replyMarkup: KeyboardBuilder.DateSelectionKeyboard(),
                 cancellationToken: cancellationToken
             );
@@ -238,7 +238,7 @@ public class OrderFlowHandler
             new[]
             {
                 InlineKeyboardButton.WithCallbackData(
-                    $"🏠 {room.Name} (до {room.Capacity} чел.)",
+                    $"🏠 {room.Name} (gacha {room.Capacity} kishi)",
                     $"room_{room.Id}"
                 )
             }
@@ -246,14 +246,14 @@ public class OrderFlowHandler
 
         buttons.Add(new[]
         {
-            InlineKeyboardButton.WithCallbackData("⬅️ Назад", "back_to_date")
+            InlineKeyboardButton.WithCallbackData("⬅️ Orqaga", "back_to_date")
         });
 
         var keyboard = new InlineKeyboardMarkup(buttons);
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Время: {timeSlotText}\n\n🏠 Выберите комнату:",
+            text: $"✅ Vaqt: {timeSlotText}\n\n🏠 Xonani tanlang:",
             replyMarkup: keyboard,
             cancellationToken: cancellationToken
         );
@@ -277,8 +277,8 @@ public class OrderFlowHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Комната: {room?.Name}\n\n" +
-   "👤 Введите имя клиента:",
+            text: $"✅ Xona: {room?.Name}\n\n" +
+   "👤 Mijoz ismini kiriting:",
             replyMarkup: KeyboardBuilder.CancelButton(),
             cancellationToken: cancellationToken
         );
@@ -305,7 +305,7 @@ public class OrderFlowHandler
             new[]
             {
                 InlineKeyboardButton.WithCallbackData(
-                    $"{p.Name} - {p.Price:N0} сум/{GetUnitShortName(p.Unit)}",
+                    $"{p.Name} - {p.Price:N0} so'm/{GetUnitShortName(p.Unit)}",
                     $"product_{p.Id}"
                 )
             }
@@ -313,14 +313,14 @@ public class OrderFlowHandler
 
         buttons.Add(new[]
         {
-            InlineKeyboardButton.WithCallbackData("⬅️ Назад к категориям", "back_to_categories")
+            InlineKeyboardButton.WithCallbackData("⬅️ Kategoriyalarga orqaga", "back_to_categories")
         });
 
         var keyboard = new InlineKeyboardMarkup(buttons);
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "🍽 Выберите блюдо:",
+            text: "🍽 Taomni tanlang:",
             replyMarkup: keyboard,
             cancellationToken: cancellationToken
         );
@@ -350,9 +350,9 @@ public class OrderFlowHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Выбрано: {product?.Name}\n" +
-                  $"💰 Narx: {product?.Price:N0} сум/{GetUnitShortName(product!.Unit)}\n\n" +
-                  $"📝 Введите количество ({GetUnitShortName(product.Unit)}):",
+            text: $"✅ Tanlandi: {product?.Name}\n" +
+                  $"💰 Narx: {product?.Price:N0} so'm/{GetUnitShortName(product!.Unit)}\n\n" +
+                  $"📝 Miqdorni kiriting ({GetUnitShortName(product.Unit)}):",
             replyMarkup: KeyboardBuilder.CancelButton(),
             cancellationToken: cancellationToken
         );
@@ -373,8 +373,8 @@ public class OrderFlowHandler
 
         buttons.Add(new[]
         {
-            InlineKeyboardButton.WithCallbackData("✅ Завершить добавление", "finish_adding"),
-            InlineKeyboardButton.WithCallbackData("❌ Отменить заказ", "cancel")
+            InlineKeyboardButton.WithCallbackData("✅ Qo'shishni yakunlash", "finish_adding"),
+            InlineKeyboardButton.WithCallbackData("❌ Buyurtmani bekor qilish", "cancel")
         });
 
         var keyboard = new InlineKeyboardMarkup(buttons);
@@ -393,7 +393,7 @@ public class OrderFlowHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "❌ Создание заказа отменено.\n\nИспользуйте /start для возврата в главное меню.",
+            text: "❌ Buyurtma yaratish bekor qilindi.\n\nAsosiy menyuga qaytish uchun /start dan foydalaning.",
             cancellationToken: cancellationToken
         );
     }
@@ -425,7 +425,7 @@ public class OrderFlowHandler
             default:
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "❓ Используйте кнопки меню или команды.",
+                    text: "❓ Menyu tugmalaridan yoki buyruqlardan foydalaning.",
                     cancellationToken: cancellationToken
                 );
                 break;
@@ -438,7 +438,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Имя не может быть пустым. Qaytadan urinib ko'ring:",
+                text: "❌ Ism bo'sh bo'lishi mumkin emas. Qaytadan urinib ko'ring:",
                 cancellationToken: cancellationToken
             );
             return;
@@ -451,7 +451,7 @@ public class OrderFlowHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Имя: {name}\n\n📞 Введите номер телефона клиента:",
+            text: $"✅ Ism: {name}\n\n📞 Mijoz telefon raqamini kiriting:",
             replyMarkup: KeyboardBuilder.CancelButton(),
             cancellationToken: cancellationToken
         );
@@ -463,7 +463,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Телефон не может быть пустым. Qaytadan urinib ko'ring:",
+                text: "❌ Telefon bo'sh bo'lishi mumkin emas. Qaytadan urinib ko'ring:",
                 cancellationToken: cancellationToken
             );
             return;
@@ -476,7 +476,7 @@ public class OrderFlowHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Телефон: {phone}\n\n👥 Введите количество гостей:",
+            text: $"✅ Telefon: {phone}\n\n👥 Mehmonlar sonini kiriting:",
             replyMarkup: KeyboardBuilder.CancelButton(),
             cancellationToken: cancellationToken
         );
@@ -488,7 +488,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Введите корректное количество гостей (число больше 0):",
+                text: "❌ To'g'ri mehmonlar sonini kiriting (0 dan katta raqam):",
                 cancellationToken: cancellationToken
             );
             return;
@@ -507,7 +507,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Введите корректное количество (число больше 0):",
+                text: "❌ To'g'ri miqdorni kiriting (0 dan katta raqam):",
                 cancellationToken: cancellationToken
             );
             return;
@@ -520,7 +520,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Ошибка: продукт не найден.",
+                text: "❌ Xatolik: mahsulot topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -556,10 +556,10 @@ public class OrderFlowHandler
         // Показываем что добавлено
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Добавлено:\n" +
-                  $"{product.Name} - {quantityText} × {product.Price:N0} = {orderItem.Subtotal:N0} сум\n\n" +
-                  $"🛒 В корзине: {stateData.Cart.Count} позиций\n" +
-                  $"💰 Сумма: {stateData.Cart.Sum(i => i.Subtotal):N0} сум",
+            text: $"✅ Qo'shildi:\n" +
+                  $"{product.Name} - {quantityText} × {product.Price:N0} = {orderItem.Subtotal:N0} so'm\n\n" +
+                  $"🛒 Savatda: {stateData.Cart.Count} ta mahsulot\n" +
+                  $"💰 Summa: {stateData.Cart.Sum(i => i.Subtotal):N0} so'm",
             cancellationToken: cancellationToken
         );
 
@@ -579,11 +579,11 @@ public class OrderFlowHandler
     {
         return unit switch
         {
-            ProductUnit.Piece => "шт",
-            ProductUnit.Kg => "кг",
-            ProductUnit.Gram => "гр",
-            ProductUnit.Liter => "л",
-            ProductUnit.Ml => "мл",
+            ProductUnit.Piece => "dona",
+            ProductUnit.Kg => "kg",
+            ProductUnit.Gram => "g",
+            ProductUnit.Liter => "l",
+            ProductUnit.Ml => "ml",
             _ => ""
         };
     }
@@ -596,7 +596,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Корзина пуста! Добавьте хотя бы одно блюдо.",
+                text: "❌ Savat bo'sh! Kamida bitta taomni qo'shing.",
                 cancellationToken: cancellationToken
             );
             await ShowCategoriesAsync(chatId, userId, cancellationToken);
@@ -612,7 +612,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Ошибка: работник не найден.",
+                text: "❌ Xatolik: xodim topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -645,29 +645,29 @@ public class OrderFlowHandler
             // Формируем красивое сообщение
             var room = await _roomService.GetRoomByIdAsync(stateData.SelectedRoomId.Value);
             var timeSlotText = stateData.SelectedTimeSlot == Core.Enums.TimeSlot.Day
-                ? "День (12:00-16:00)"
-                : "Вечер (17:00-22:00)";
+                ? "Kun (12:00-16:00)"
+                : "Kechqurun (17:00-22:00)";
 
-            var message = $"✅ Заказ создан!\n\n" +
-                         $"📋 Заказ #{order.OrderNumber}\n" +
+            var message = $"✅ Buyurtma yaratildi!\n\n" +
+                         $"📋 Buyurtma #{order.OrderNumber}\n" +
                          $"━━━━━━━━━━━━━━━━━━━━\n" +
                          $"👤 {order.ClientName}\n" +
                          $"📞 {order.ClientPhone}\n" +
-                         $"👥 Гостей: {order.GuestCount}\n" +
+                         $"👥 Mehmonlar: {order.GuestCount}\n" +
                          $"🏠 {room?.Name}\n" +
                          $"📅 {order.BookingDate:dd.MM.yyyy}\n" +
                          $"⏰ {timeSlotText}\n" +
                          $"━━━━━━━━━━━━━━━━━━━━\n\n" +
-                         $"🍽 Заказ:\n";
+                         $"🍽 Buyurtma:\n";
 
             foreach (var item in stateData.Cart)
             {
                 var quantityText = FormatQuantity(item.Quantity, item.Unit);
-                message += $"• {item.ProductName} - {quantityText} × {item.Price:N0} сум = {item.Subtotal:N0} сум\n";
+                message += $"• {item.ProductName} - {quantityText} × {item.Price:N0} so'm = {item.Subtotal:N0} so'm\n";
             }
 
             message += $"\n━━━━━━━━━━━━━━━━━━━━\n" +
-                      $"💰 ИТОГО: {stateData.Cart.Sum(i => i.Subtotal):N0} сум";
+                      $"💰 JAMI: {stateData.Cart.Sum(i => i.Subtotal):N0} so'm";
 
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
@@ -684,7 +684,7 @@ public class OrderFlowHandler
             _logger.LogError(ex, "Error creating order");
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при создании заказа: {ex.Message}",
+                text: $"❌ Buyurtma yaratishda xatolik: {ex.Message}",
                 cancellationToken: cancellationToken
             );
         }
@@ -694,11 +694,11 @@ public class OrderFlowHandler
     {
         return unit switch
         {
-            ProductUnit.Piece => $"{quantity:0.##} шт",
-            ProductUnit.Kg => $"{quantity:0.##} кг",
-            ProductUnit.Gram => $"{quantity:0} гр",
-            ProductUnit.Liter => $"{quantity:0.##} л",
-            ProductUnit.Ml => $"{quantity:0} мл",
+            ProductUnit.Piece => $"{quantity:0.##} dona",
+            ProductUnit.Kg => $"{quantity:0.##} kg",
+            ProductUnit.Gram => $"{quantity:0} g",
+            ProductUnit.Liter => $"{quantity:0.##} l",
+            ProductUnit.Ml => $"{quantity:0} ml",
             _ => quantity.ToString()
         };
     }
@@ -711,7 +711,7 @@ public class OrderFlowHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "❌ Заказ не найден.",
+            text: "❌ Buyurtma topilmadi.",
             cancellationToken: cancellationToken
         );
         return;
@@ -721,7 +721,7 @@ public class OrderFlowHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "❌ К этому заказу нельзя добавить позиции (заказ завершен или отменен).",
+            text: "❌ Bu buyurtmaga pozitsiyalar qo'shib bo'lmaydi (buyurtma tugagan yoki bekor qilingan).",
             cancellationToken: cancellationToken
         );
         return;
@@ -736,8 +736,8 @@ public class OrderFlowHandler
 
     await _botClient.SendTextMessageAsync(
         chatId: chatId,
-        text: $"➕ Дозаказ к заказу #{order.OrderNumber}\n\n" +
-              $"Текущая сумма: {order.TotalAmount:N0} сум\n\n" +
+        text: $"➕ Buyurtma #{order.OrderNumber} ga qo'shimcha buyurtma\n\n" +
+              $"Joriy summa: {order.TotalAmount:N0} so'm\n\n" +
               "Taomlar qo'shish uchun kategoriyani tanlang:",
         cancellationToken: cancellationToken
     );
@@ -758,15 +758,15 @@ public class OrderFlowHandler
 
         buttons.Add(new[]
         {
-        InlineKeyboardButton.WithCallbackData("✅ Завершить дозаказ", "finish_adding_items"),
-        InlineKeyboardButton.WithCallbackData("❌ Отменить", "cancel_adding")
+        InlineKeyboardButton.WithCallbackData("✅ Qo'shimcha buyurtmani yakunlash", "finish_adding_items"),
+        InlineKeyboardButton.WithCallbackData("❌ Bekor qilish", "cancel_adding")
     });
 
         var keyboard = new InlineKeyboardMarkup(buttons);
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "📋 Выберите категорию:",
+            text: "📋 Kategoriyani tanlang:",
             replyMarkup: keyboard,
             cancellationToken: cancellationToken
         );
@@ -780,7 +780,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Ошибка: заказ не найден.",
+                text: "❌ Xatolik: buyurtma topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -790,7 +790,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Вы не добавили ни одного блюда.",
+                text: "❌ Siz hech bir taomni qo'shmadingiz.",
                 cancellationToken: cancellationToken
             );
             await ShowCategoriesForAddingAsync(chatId, userId, cancellationToken);
@@ -805,7 +805,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Ошибка: работник не найден.",
+                text: "❌ Xatolik: xodim topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -829,19 +829,19 @@ public class OrderFlowHandler
 
             if (order != null)
             {
-                var message = $"✅ Дозаказ успешно добавлен!\n\n" +
-                             $"📋 Заказ #{order.OrderNumber}\n" +
+                var message = $"✅ Qo'shimcha buyurtma muvaffaqiyatli qo'shildi!\n\n" +
+                             $"📋 Buyurtma #{order.OrderNumber}\n" +
                              $"━━━━━━━━━━━━━━━━━━━━\n\n" +
-                             $"➕ Добавлено:\n";
+                             $"➕ Qo'shildi:\n";
 
                 foreach (var item in stateData.Cart)
                 {
                     var quantityText = FormatQuantity(item.Quantity, item.Unit);
-                    message += $"• {item.ProductName} - {quantityText} × {item.Price:N0} сум = {item.Subtotal:N0} сум\n";
+                    message += $"• {item.ProductName} - {quantityText} × {item.Price:N0} so'm = {item.Subtotal:N0} so'm\n";
                 }
 
                 message += $"\n━━━━━━━━━━━━━━━━━━━━\n" +
-                          $"💰 Новая сумма заказа: {order.TotalAmount:N0} сум";
+                          $"💰 Buyurtmaning yangi summasi: {order.TotalAmount:N0} so'm";
 
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
@@ -859,7 +859,7 @@ public class OrderFlowHandler
             _logger.LogError(ex, "Error adding items to order");
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при добавлении: {ex.Message}",
+                text: $"❌ Qo'shishda xatolik: {ex.Message}",
                 cancellationToken: cancellationToken
             );
         }

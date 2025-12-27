@@ -60,7 +60,7 @@ public class BotUpdateHandler : IUpdateHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обработке update");
+            _logger.LogError(ex, "Update ni qayta ishlashda xatolik");
         }
     }
 
@@ -73,7 +73,7 @@ public class BotUpdateHandler : IUpdateHandler
         var chatId = message.Chat.Id;
         var messageText = message.Text ?? string.Empty;
 
-        _logger.LogInformation("Получено сообщение: {Text} от {UserId}", messageText, userId);
+        _logger.LogInformation("Xabar qabul qilindi: {Text} dan {UserId}", messageText, userId);
 
         using var scope = _serviceProvider.CreateScope();
         var commandHandler = scope.ServiceProvider.GetRequiredService<CommandHandler>();
@@ -177,7 +177,7 @@ public class BotUpdateHandler : IUpdateHandler
         var chatId = callbackQuery.Message.Chat.Id;
         var data = callbackQuery.Data ?? string.Empty;
 
-        _logger.LogInformation("Получен callback: {Data} от {UserId}", data, userId);
+        _logger.LogInformation("Callback qabul qilindi: {Data} dan {UserId}", data, userId);
 
         // Отвечаем на callback сразу, чтобы избежать таймаутов
         try
@@ -321,7 +321,7 @@ public class BotUpdateHandler : IUpdateHandler
 
     public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Ошибка polling");
+        _logger.LogError(exception, "Polling xatoligi");
         return Task.CompletedTask;
     }
 }

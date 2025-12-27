@@ -24,7 +24,7 @@ public class CategoryAdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Управление категориями:",
+            text: "Kategoriyalarni boshqarish:",
             replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
             cancellationToken: cancellationToken);
     }
@@ -36,7 +36,7 @@ public class CategoryAdminHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите название категории:",
+            text: "Kategoriya nomini kiriting:",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -49,7 +49,7 @@ public class CategoryAdminHandler
         _userStateManager.SetState(userId, UserState.AdminAddingCategoryDisplayOrder);
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите порядок отображения (число, например: 1, 2, 3...):",
+            text: "Ko'rsatish tartibini kiriting (raqam, masalan: 1, 2, 3...):",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -60,7 +60,7 @@ public class CategoryAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Noto'g'ri format. Введите число для порядка отображения:",
+                text: "❌ Noto'g'ri format. Ko'rsatish tartibi uchun raqam kiriting:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -70,7 +70,7 @@ public class CategoryAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Ошибка: название категории не найдено. Начните заново.",
+                text: "❌ Xatolik: kategoriya nomi topilmadi. Qaytadan boshlang.",
                 replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                 cancellationToken: cancellationToken);
             _userStateManager.ClearState(userId);
@@ -83,7 +83,7 @@ public class CategoryAdminHandler
 
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"✅ Kategoriya '{category.Name}' успешно создана!",
+                text: $"✅ Kategoriya '{category.Name}' muvaffaqiyatli yaratildi!",
                 replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                 cancellationToken: cancellationToken);
 
@@ -93,7 +93,7 @@ public class CategoryAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при создании категории: {ex.Message}",
+                text: $"❌ Kategoriya yaratishda xatolik: {ex.Message}",
                 replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                 cancellationToken: cancellationToken);
             _userStateManager.ClearState(userId);
@@ -110,7 +110,7 @@ public class CategoryAdminHandler
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "📁 В данный момент нет активных категорий.",
+                    text: "📁 Hozirda faol kategoriyalar yo'q.",
                     replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                     cancellationToken: cancellationToken);
                 return;
@@ -119,7 +119,7 @@ public class CategoryAdminHandler
             // Отправляем заголовок
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "📁 Список категорий:",
+                text: "📁 Kategoriyalar ro'yxati:",
                 replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                 cancellationToken: cancellationToken);
 
@@ -128,19 +128,19 @@ public class CategoryAdminHandler
             {
                 var message = $"📂 {category.Name}\n";
                 message += $"   ID: {category.Id}\n";
-                message += $"   Порядок: {category.DisplayOrder}\n";
-                message += $"   Активна: {(category.IsActive ? "✅ Да" : "❌ Нет")}";
+                message += $"   Tartib: {category.DisplayOrder}\n";
+                message += $"   Faol: {(category.IsActive ? "✅ Ha" : "❌ Yo'q")}";
 
                 var buttons = new InlineKeyboardMarkup(new[]
                 {
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("✏️ Редактировать", $"edit_category_{category.Id}"),
+                        InlineKeyboardButton.WithCallbackData("✏️ Tahrirlash", $"edit_category_{category.Id}"),
                         InlineKeyboardButton.WithCallbackData("🗑️ O'chirish", $"delete_category_{category.Id}")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("🔄 Статус", $"toggle_category_{category.Id}")
+                        InlineKeyboardButton.WithCallbackData("🔄 Holat", $"toggle_category_{category.Id}")
                     }
                 });
 
@@ -155,7 +155,7 @@ public class CategoryAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при получении списка категорий: {ex.Message}",
+                text: $"❌ Kategoriyalar ro'yxatini olishda xatolik: {ex.Message}",
                 replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                 cancellationToken: cancellationToken);
         }
@@ -179,21 +179,21 @@ public class CategoryAdminHandler
             await _botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId,
-                text: $"✏️ Редактирование категории '{category.Name}'\n\nТекущие данные:\nNomi: {category.Name}\nПорядок: {category.DisplayOrder}\nАктивна: {(category.IsActive ? "Да" : "Нет")}\n\nЧто изменить?",
+                text: $"✏️ Kategoriya '{category.Name}'ni tahrirlash\n\nJoriy ma'lumotlar:\nNomi: {category.Name}\nTartib: {category.DisplayOrder}\nFaol: {(category.IsActive ? "Ha" : "Yo'q")}\n\nNima o'zgartirmoqchisiz?",
                 replyMarkup: new InlineKeyboardMarkup(new[]
                 {
                     new[]
                     {
                         InlineKeyboardButton.WithCallbackData("📝 Nomi", $"edit_category_name_{categoryId}"),
-                        InlineKeyboardButton.WithCallbackData("🔢 Порядок", $"edit_category_order_{categoryId}")
+                        InlineKeyboardButton.WithCallbackData("🔢 Tartib", $"edit_category_order_{categoryId}")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("🔄 Статус", $"toggle_category_{categoryId}")
+                        InlineKeyboardButton.WithCallbackData("🔄 Holat", $"toggle_category_{categoryId}")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("⬅️ Назад", "admin_list_categories")
+                        InlineKeyboardButton.WithCallbackData("⬅️ Orqaga", "admin_list_categories")
                     }
                 }),
                 cancellationToken: cancellationToken);
@@ -214,7 +214,7 @@ public class CategoryAdminHandler
             await _botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId,
-                text: $"🗑️ Вы уверены, что хотите удалить категорию '{category.Name}'?\n\n⚠️ Это действие нельзя отменить!\n⚠️ Все продукты в этой категории также будут удалены!",
+                text: $"🗑️ Siz haqiqatan ham '{category.Name}' kategoriyasini o'chirmoqchimisiz?\n\n⚠️ Bu harakatni bekor qilib bo'lmaydi!\n⚠️ Bu kategoriyadagi barcha mahsulotlar ham o'chiriladi!",
                 replyMarkup: KeyboardBuilder.YesNoKeyboard("confirm_delete_category", categoryId),
                 cancellationToken: cancellationToken);
         }
@@ -241,10 +241,10 @@ public class CategoryAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: $"✅ Kategoriya '{category.Name}' теперь {(newStatus ? "активна" : "неактивна")}.",
+                        text: $"✅ Kategoriya '{category.Name}' endi {(newStatus ? "faol" : "faol emas")}.",
                         replyMarkup: new InlineKeyboardMarkup(new[]
                         {
-                            InlineKeyboardButton.WithCallbackData("⬅️ К списку категорий", "admin_list_categories")
+                            InlineKeyboardButton.WithCallbackData("⬅️ Kategoriyalar ro'yxatiga", "admin_list_categories")
                         }),
                         cancellationToken: cancellationToken);
                 }
@@ -264,7 +264,7 @@ public class CategoryAdminHandler
             try
             {
                 var category = await _productService.GetCategoryByIdAsync(categoryId);
-                var categoryName = category?.Name ?? "Неизвестная категория";
+                var categoryName = category?.Name ?? "Noma'lum kategoriya";
 
                 var success = await _productService.DeleteCategoryAsync(categoryId);
 
@@ -273,10 +273,10 @@ public class CategoryAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: $"✅ Kategoriya '{categoryName}' и все ее продукты успешно удалены!",
+                        text: $"✅ '{categoryName}' kategoriyasi va barcha mahsulotlari muvaffaqiyatli o'chirildi!",
                         replyMarkup: new InlineKeyboardMarkup(new[]
                         {
-                            InlineKeyboardButton.WithCallbackData("⬅️ К списку категорий", "admin_list_categories")
+                            InlineKeyboardButton.WithCallbackData("⬅️ Kategoriyalar ro'yxatiga", "admin_list_categories")
                         }),
                         cancellationToken: cancellationToken);
                 }
@@ -285,10 +285,10 @@ public class CategoryAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "❌ Не удалось удалить категорию.",
+                        text: "❌ Kategoriyani o'chirib bo'lmadi.",
                         replyMarkup: new InlineKeyboardMarkup(new[]
                         {
-                            InlineKeyboardButton.WithCallbackData("⬅️ К списку категорий", "admin_list_categories")
+                            InlineKeyboardButton.WithCallbackData("⬅️ Kategoriyalar ro'yxatiga", "admin_list_categories")
                         }),
                         cancellationToken: cancellationToken);
                 }
@@ -298,10 +298,10 @@ public class CategoryAdminHandler
                 await _botClient.EditMessageTextAsync(
                     chatId: chatId,
                     messageId: messageId,
-                    text: $"❌ Ошибка при удалении категории: {ex.Message}",
+                    text: $"❌ Kategoriyani o'chirishda xatolik: {ex.Message}",
                     replyMarkup: new InlineKeyboardMarkup(new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("⬅️ К списку категорий", "admin_list_categories")
+                        InlineKeyboardButton.WithCallbackData("⬅️ Kategoriyalar ro'yxatiga", "admin_list_categories")
                     }),
                     cancellationToken: cancellationToken);
             }
@@ -313,10 +313,10 @@ public class CategoryAdminHandler
         await _botClient.EditMessageTextAsync(
             chatId: chatId,
             messageId: messageId,
-            text: "❌ Удаление категории отменено.",
+            text: "❌ Kategoriyani o'chirish bekor qilindi.",
             replyMarkup: new InlineKeyboardMarkup(new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ К списку категорий", "admin_list_categories")
+                InlineKeyboardButton.WithCallbackData("⬅️ Kategoriyalar ro'yxatiga", "admin_list_categories")
             }),
             cancellationToken: cancellationToken);
     }
@@ -342,11 +342,11 @@ public class CategoryAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "Введите новое название категории:",
+                        text: "Kategoriya uchun yangi nom kiriting:",
                         cancellationToken: cancellationToken);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "Введите новое название категории:",
+                        text: "Kategoriya uchun yangi nom kiriting:",
                         replyMarkup: new ForceReplyMarkup { Selective = true },
                         cancellationToken: cancellationToken);
                     break;
@@ -355,11 +355,11 @@ public class CategoryAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "Введите новый порядок отображения (число):",
+                        text: "Yangi ko'rsatish tartibini kiriting (raqam):",
                         cancellationToken: cancellationToken);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "Введите новый порядок отображения (число):",
+                        text: "Yangi ko'rsatish tartibini kiriting (raqam):",
                         replyMarkup: new ForceReplyMarkup { Selective = true },
                         cancellationToken: cancellationToken);
                     break;
@@ -367,7 +367,7 @@ public class CategoryAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "Неизвестное поле для редактирования.",
+                        text: "Tahrirlash uchun noma'lum maydon.",
                         replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                         cancellationToken: cancellationToken);
                     _userStateManager.ClearState(userId);
@@ -468,7 +468,7 @@ public class CategoryAdminHandler
                     await _productService.UpdateCategoryAsync(categoryId, messageText, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Nomi категории успешно обновлено!",
+                        text: "✅ Kategoriya nomi muvaffaqiyatli yangilandi!",
                         replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -477,14 +477,14 @@ public class CategoryAdminHandler
                     {
                         await _botClient.SendTextMessageAsync(
                             chatId: chatId,
-                            text: "❌ Noto'g'ri format. Введите число для порядка отображения:",
+                            text: "❌ Formati noto'g'ri. Ko'rsatish tartibi uchun raqam kiriting:",
                             cancellationToken: cancellationToken);
                         return;
                     }
                     await _productService.UpdateCategoryAsync(categoryId, null, displayOrder, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Порядок отображения категории успешно обновлен!",
+                        text: "✅ Kategoriya ko'rsatish tartibi muvaffaqiyatli yangilandi!",
                         replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -496,7 +496,7 @@ public class CategoryAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при обновлении категории: {ex.Message}",
+                text: $"❌ Kategoriya yangilanishida xatolik: {ex.Message}",
                 replyMarkup: KeyboardBuilder.ManageCategoriesKeyboard(),
                 cancellationToken: cancellationToken);
             _userStateManager.ClearState(userId);

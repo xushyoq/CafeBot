@@ -68,7 +68,7 @@ public class OrderListHandler
         var buttons = activeOrders.Select(order =>
         {
             var statusEmoji = GetStatusEmoji(order.Status);
-            var timeSlotText = order.TimeSlot == TimeSlot.Day ? "День" : "Вечер";
+            var timeSlotText = order.TimeSlot == TimeSlot.Day ? "Kun" : "Kechqurun";
 
             return new[]
             {
@@ -81,15 +81,15 @@ public class OrderListHandler
 
         buttons.Add(new[]
         {
-            InlineKeyboardButton.WithCallbackData("🔄 Обновить", "refresh_orders")
+            InlineKeyboardButton.WithCallbackData("🔄 Yangilash", "refresh_orders")
         });
 
         var keyboard = new InlineKeyboardMarkup(buttons);
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"📋 Ваши активные заказы ({activeOrders.Count}):\n\n" +
-                  "Нажмите на заказ для просмотра деталей:",
+            text: $"📋 Sizning faol buyurtmalaringiz ({activeOrders.Count}):\n\n" +
+                  "Tafsilotlarni ko'rish uchun buyurtmani bosing:",
             replyMarkup: keyboard,
             cancellationToken: cancellationToken
         );
@@ -112,20 +112,20 @@ public class OrderListHandler
         var statusEmoji = GetStatusEmoji(order.Status);
         var statusText = GetStatusText(order.Status);
         var timeSlotText = order.TimeSlot == TimeSlot.Day
-            ? "День (12:00-16:00)"
-            : "Вечер (17:00-22:00)";
+            ? "Kun (12:00-16:00)"
+            : "Kechqurun (17:00-22:00)";
 
         var message = $"{statusEmoji} Заказ #{order.OrderNumber}\n" +
                      $"━━━━━━━━━━━━━━━━━━━━\n" +
-                     $"📊 Статус: {statusText}\n" +
-                     $"👤 Клиент: {order.ClientName}\n" +
-                     $"📞 Телефон: {order.ClientPhone}\n" +
-                     $"👥 Гостей: {order.GuestCount}\n" +
-                     $"🏠 Комната: {order.Room.Name}\n" +
-                     $"📅 Дата: {order.BookingDate:dd.MM.yyyy}\n" +
-                     $"⏰ Время: {timeSlotText}\n" +
+                     $"📊 Holat: {statusText}\n" +
+                     $"👤 Mijoz: {order.ClientName}\n" +
+                     $"📞 Telefon: {order.ClientPhone}\n" +
+                     $"👥 Mehmonlar: {order.GuestCount}\n" +
+                     $"🏠 Xona: {order.Room.Name}\n" +
+                     $"📅 Sana: {order.BookingDate:dd.MM.yyyy}\n" +
+                     $"⏰ Vaqt: {timeSlotText}\n" +
                      $"━━━━━━━━━━━━━━━━━━━━\n\n" +
-                     $"🍽 Заказ:\n";
+                     $"🍽 Buyurtma:\n";
 
         foreach (var item in order.OrderItems)
         {
@@ -135,9 +135,9 @@ public class OrderListHandler
         }
 
         message += $"\n━━━━━━━━━━━━━━━━━━━━\n" +
-                  $"💰 ИТОГО: {order.TotalAmount:N0} сум\n" +
+                  $"💰 JAMI: {order.TotalAmount:N0} so'm\n" +
                   $"━━━━━━━━━━━━━━━━━━━━\n\n" +
-                  $"🕐 Создан: {order.CreatedAt:dd.MM.yyyy HH:mm}";
+                  $"🕐 Yaratilgan: {order.CreatedAt:dd.MM.yyyy HH:mm}";
 
         // Кнопки действий в зависимости от статуса
         var buttons = new List<InlineKeyboardButton[]>();
@@ -146,29 +146,29 @@ public class OrderListHandler
         {
             buttons.Add(new[]
             {
-        InlineKeyboardButton.WithCallbackData("✅ Подтвердить", $"confirm_order_{orderId}"),
-        InlineKeyboardButton.WithCallbackData("🔥 Активировать", $"activate_order_{orderId}")
+        InlineKeyboardButton.WithCallbackData("✅ Tasdiqlash", $"confirm_order_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("🔥 Faollashtirish", $"activate_order_{orderId}")
     });
             buttons.Add(new[]
             {
-        InlineKeyboardButton.WithCallbackData("➕ Дозаказать", $"addmore_{orderId}"),
-        InlineKeyboardButton.WithCallbackData("💰 К оплате", $"topayment_{orderId}")
+        InlineKeyboardButton.WithCallbackData("➕ Qo'shimcha buyurtma", $"addmore_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("💰 To'lovga", $"topayment_{orderId}")
     });
             buttons.Add(new[]
             {
-        InlineKeyboardButton.WithCallbackData("❌ Отменить заказ", $"cancel_order_{orderId}")
+        InlineKeyboardButton.WithCallbackData("❌ Buyurtmani bekor qilish", $"cancel_order_{orderId}")
     });
         }
         else if (order.Status == OrderStatus.Confirmed)
         {
             buttons.Add(new[]
             {
-        InlineKeyboardButton.WithCallbackData("🔥 Клиент пришёл", $"activate_order_{orderId}"),
-        InlineKeyboardButton.WithCallbackData("➕ Дозаказать", $"addmore_{orderId}")
+        InlineKeyboardButton.WithCallbackData("🔥 Mijoz keldi", $"activate_order_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("➕ Qo'shimcha buyurtma", $"addmore_{orderId}")
     });
             buttons.Add(new[]
             {
-        InlineKeyboardButton.WithCallbackData("💰 К оплате", $"topayment_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("💰 To'lovga", $"topayment_{orderId}"),
         InlineKeyboardButton.WithCallbackData("❌ Отменить", $"cancel_order_{orderId}")
     });
         }
@@ -176,26 +176,26 @@ public class OrderListHandler
         {
             buttons.Add(new[]
             {
-        InlineKeyboardButton.WithCallbackData("➕ Дозаказать", $"addmore_{orderId}"),
-        InlineKeyboardButton.WithCallbackData("💰 К оплате", $"topayment_{orderId}")
+        InlineKeyboardButton.WithCallbackData("➕ Qo'shimcha buyurtma", $"addmore_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("💰 To'lovga", $"topayment_{orderId}")
     });
         }
         else if (order.Status == OrderStatus.ReadyToPay)
         {
             buttons.Add(new[]
             {
-        InlineKeyboardButton.WithCallbackData("💵 Оплата наличными", $"pay_cash_{orderId}"),
-        InlineKeyboardButton.WithCallbackData("💳 Оплата картой", $"pay_card_{orderId}")
+        InlineKeyboardButton.WithCallbackData("💵 Naqd to'lov", $"pay_cash_{orderId}"),
+        InlineKeyboardButton.WithCallbackData("💳 Karta orqali to'lov", $"pay_card_{orderId}")
     });
             buttons.Add(new[]
             {
-        InlineKeyboardButton.WithCallbackData("📱 Перевод", $"pay_transfer_{orderId}")
+        InlineKeyboardButton.WithCallbackData("📱 O'tkazma", $"pay_transfer_{orderId}")
     });
         }
 
         buttons.Add(new[]
         {
-    InlineKeyboardButton.WithCallbackData("⬅️ К списку заказов", "back_to_orders")
+    InlineKeyboardButton.WithCallbackData("⬅️ Buyurtmalar ro'yxatiga", "back_to_orders")
 });
 
         var keyboard = new InlineKeyboardMarkup(buttons);
@@ -227,14 +227,14 @@ public class OrderListHandler
     {
         return status switch
         {
-            OrderStatus.Created => "Создан",
-            OrderStatus.Confirmed => "Подтвержден",
-            OrderStatus.Active => "Активен",
-            OrderStatus.ReadyToPay => "Готов к оплате",
-            OrderStatus.Paid => "Оплачен",
-            OrderStatus.Completed => "Завершен",
-            OrderStatus.Cancelled => "Отменен",
-            _ => "Неизвестно"
+            OrderStatus.Created => "Yaratildi",
+            OrderStatus.Confirmed => "Tasdiqlandi",
+            OrderStatus.Active => "Faol",
+            OrderStatus.ReadyToPay => "To'lovga tayyor",
+            OrderStatus.Paid => "To'landi",
+            OrderStatus.Completed => "Tugagan",
+            OrderStatus.Cancelled => "Bekor qilingan",
+            _ => "Noma'lum"
         };
     }
 

@@ -40,7 +40,7 @@ public class PaymentHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Заказ не найден.",
+                text: "❌ Buyurtma topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -64,15 +64,15 @@ public class PaymentHandler
     private async Task ShowPaymentOptionsAsync(long chatId, Core.Entities.Order order, CancellationToken cancellationToken)
     {
         var timeSlotText = order.TimeSlot == TimeSlot.Day 
-            ? "День (12:00-16:00)" 
-            : "Вечер (17:00-22:00)";
+            ? "Kun (12:00-16:00)"
+            : "Kechqurun (17:00-22:00)";
 
-        var message = $"💰 Заказ готов к оплате\n\n" +
+        var message = $"💰 Buyurtma to'lovga tayyor\n\n" +
                      $"📋 Заказ #{order.OrderNumber}\n" +
                      $"━━━━━━━━━━━━━━━━━━━━\n" +
                      $"👤 {order.ClientName}\n" +
                      $"📞 {order.ClientPhone}\n" +
-                     $"👥 Гостей: {order.GuestCount}\n" +
+                     $"👥 Mehmonlar: {order.GuestCount}\n" +
                      $"🏠 {order.Room.Name}\n" +
                      $"📅 {order.BookingDate:dd.MM.yyyy}\n" +
                      $"⏰ {timeSlotText}\n" +
@@ -87,24 +87,24 @@ public class PaymentHandler
         }
 
         message += $"\n━━━━━━━━━━━━━━━━━━━━\n" +
-                  $"💰 К ОПЛАТЕ: {order.TotalAmount:N0} сум\n" +
+                  $"💰 TO'LOVGA: {order.TotalAmount:N0} so'm\n" +
                   $"━━━━━━━━━━━━━━━━━━━━\n\n" +
-                  $"Выберите способ оплаты:";
+                  $"To'lov usulini tanlang:";
 
         var keyboard = new InlineKeyboardMarkup(new[]
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("💵 Наличные", $"pay_cash_{order.Id}"),
-                InlineKeyboardButton.WithCallbackData("💳 Карта", $"pay_card_{order.Id}")
+                InlineKeyboardButton.WithCallbackData("💵 Naqd", $"pay_cash_{order.Id}"),
+                InlineKeyboardButton.WithCallbackData("💳 Karta", $"pay_card_{order.Id}")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("📱 Перевод", $"pay_transfer_{order.Id}")
+                InlineKeyboardButton.WithCallbackData("📱 O'tkazma", $"pay_transfer_{order.Id}")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ Назад к заказу", $"vieworder_{order.Id}")
+                InlineKeyboardButton.WithCallbackData("⬅️ Buyurtmaga orqaga", $"vieworder_{order.Id}")
             }
         });
 
@@ -123,7 +123,7 @@ public class PaymentHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Работник не найден.",
+                text: "❌ Xodim topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -145,7 +145,7 @@ public class PaymentHandler
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "❌ Ошибка при получении заказа.",
+                    text: "❌ Buyurtma olishda xatolik.",
                     cancellationToken: cancellationToken
                 );
                 return;
@@ -159,19 +159,19 @@ public class PaymentHandler
                 PaymentMethod.Cash => "💵 Наличными",
                 PaymentMethod.Card => "💳 Картой",
                 PaymentMethod.Transfer => "📱 Переводом",
-                _ => "Неизвестно"
+                _ => "Noma'lum"
             };
 
             var timeSlotText = order.TimeSlot == TimeSlot.Day 
-                ? "День (12:00-16:00)" 
-                : "Вечер (17:00-22:00)";
+                ? "Kun (12:00-16:00)"
+                : "Kechqurun (17:00-22:00)";
 
-            var message = $"✅ Оплата принята!\n\n" +
+            var message = $"✅ To'lov qabul qilindi!\n\n" +
                          $"📋 Заказ #{order.OrderNumber}\n" +
                          $"━━━━━━━━━━━━━━━━━━━━\n" +
                          $"👤 {order.ClientName}\n" +
                          $"📞 {order.ClientPhone}\n" +
-                         $"👥 Гостей: {order.GuestCount}\n" +
+                         $"👥 Mehmonlar: {order.GuestCount}\n" +
                          $"🏠 {order.Room.Name}\n" +
                          $"📅 {order.BookingDate:dd.MM.yyyy}\n" +
                          $"⏰ {timeSlotText}\n" +
@@ -186,12 +186,12 @@ public class PaymentHandler
             }
 
             message += $"\n━━━━━━━━━━━━━━━━━━━━\n" +
-                      $"💰 ИТОГО: {order.TotalAmount:N0} сум\n" +
+                      $"💰 JAMI: {order.TotalAmount:N0} so'm\n" +
                       $"━━━━━━━━━━━━━━━━━━━━\n\n" +
-                      $"💳 Способ оплаты: {methodText}\n" +
-                      $"✅ Оплачено: {payment.Amount:N0} сум\n" +
-                      $"🕐 Время: {payment.PaidAt:dd.MM.yyyy HH:mm}\n\n" +
-                      $"Спасибо! Заказ завершен! 🎉";
+                      $"💳 To'lov usuli: {methodText}\n" +
+                      $"✅ To'landi: {payment.Amount:N0} so'm\n" +
+                      $"🕐 Vaqt: {payment.PaidAt:dd.MM.yyyy HH:mm}\n\n" +
+                      $"Rahmat! Buyurtma bajarildi! 🎉";
 
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
@@ -207,7 +207,7 @@ public class PaymentHandler
             _logger.LogError(ex, "Error processing payment for order {OrderId}", orderId);
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при обработке оплаты: {ex.Message}",
+                text: $"❌ To'lovni qayta ishlashda xatolik: {ex.Message}",
                 cancellationToken: cancellationToken
             );
         }

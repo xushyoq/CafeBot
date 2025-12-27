@@ -34,7 +34,7 @@ public class OrderManagementHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Заказ не найден.",
+                text: "❌ Buyurtma topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -44,7 +44,7 @@ public class OrderManagementHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Только новые заказы можно подтверждать.",
+                text: "❌ Faqat yangi buyurtmalarni tasdiqlash mumkin.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -54,13 +54,13 @@ public class OrderManagementHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"✅ Заказ #{order.OrderNumber} подтверждён!\n\n" +
-                  $"Клиент: {order.ClientName}\n" +
-                  $"Телефон: {order.ClientPhone}\n" +
-                  $"Комната: {order.Room.Name}\n" +
-                  $"Дата: {order.BookingDate:dd.MM.yyyy}\n" +
-                  $"Время: {GetTimeSlotText(order.TimeSlot)}\n\n" +
-                  $"Ожидаем клиента в указанное время.",
+            text: $"✅ Buyurtma #{order.OrderNumber} tasdiqlandi!\n\n" +
+                  $"Mijoz: {order.ClientName}\n" +
+                  $"Telefon: {order.ClientPhone}\n" +
+                  $"Xona: {order.Room.Name}\n" +
+                  $"Sana: {order.BookingDate:dd.MM.yyyy}\n" +
+                  $"Vaqt: {GetTimeSlotText(order.TimeSlot)}\n\n" +
+                  $"Mijozni ko'rsatilgan vaqtda kutamiz.",
             cancellationToken: cancellationToken
         );
 
@@ -75,7 +75,7 @@ public class OrderManagementHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Заказ не найден.",
+                text: "❌ Buyurtma topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -85,7 +85,7 @@ public class OrderManagementHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Только подтверждённые заказы можно активировать.",
+                text: "❌ Faqat tasdiqlangan buyurtmalarni faollashtirish mumkin.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -95,11 +95,11 @@ public class OrderManagementHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: $"🔥 Заказ #{order.OrderNumber} активирован!\n\n" +
-                  $"Клиент: {order.ClientName}\n" +
-                  $"Комната: {order.Room.Name}\n" +
-                  $"Сумма: {order.TotalAmount:N0} сум\n\n" +
-                  $"Клиент в комнате, приятного аппетита! 🍽",
+            text: $"🔥 Buyurtma #{order.OrderNumber} faollashtirildi!\n\n" +
+                  $"Mijoz: {order.ClientName}\n" +
+                  $"Xona: {order.Room.Name}\n" +
+                  $"Summa: {order.TotalAmount:N0} so'm\n\n" +
+                  $"Mijoz xonada, ishtaha och gullay! 🍽",
             cancellationToken: cancellationToken
         );
 
@@ -114,7 +114,7 @@ public class OrderManagementHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Заказ не найден.",
+                text: "❌ Buyurtma topilmadi.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -124,7 +124,7 @@ public class OrderManagementHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Этот заказ нельзя отменить (уже активен или завершён).",
+                text: "❌ Bu buyurtmani bekor qilib bo'lmaydi (allaqachon faol yoki tugagan).",
                 cancellationToken: cancellationToken
             );
             return;
@@ -138,12 +138,12 @@ public class OrderManagementHandler
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: $"❌ Заказ #{order.OrderNumber} отменён\n\n" +
-                          $"Клиент: {order.ClientName}\n" +
-                          $"Телефон: {order.ClientPhone}\n" +
-                          $"Комната: {order.Room.Name}\n" +
-                          $"Дата: {order.BookingDate:dd.MM.yyyy}\n\n" +
-                          $"Комната освобождена.",
+                    text: $"❌ Buyurtma #{order.OrderNumber} bekor qilindi\n\n" +
+                          $"Mijoz: {order.ClientName}\n" +
+                          $"Telefon: {order.ClientPhone}\n" +
+                          $"Xona: {order.Room.Name}\n" +
+                          $"Sana: {order.BookingDate:dd.MM.yyyy}\n\n" +
+                          $"Xona bo'shatildi.",
                     cancellationToken: cancellationToken
                 );
 
@@ -153,7 +153,7 @@ public class OrderManagementHandler
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "❌ Ошибка при отмене заказа.",
+                    text: "❌ Buyurtmani bekor qilishda xatolik.",
                     cancellationToken: cancellationToken
                 );
             }
@@ -163,7 +163,7 @@ public class OrderManagementHandler
             _logger.LogError(ex, "Error cancelling order {OrderId}", orderId);
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка: {ex.Message}",
+                text: $"❌ Xatolik: {ex.Message}",
                 cancellationToken: cancellationToken
             );
         }
@@ -171,6 +171,6 @@ public class OrderManagementHandler
 
     private string GetTimeSlotText(TimeSlot timeSlot)
     {
-        return timeSlot == TimeSlot.Day ? "День (12:00-16:00)" : "Вечер (17:00-22:00)";
+        return timeSlot == TimeSlot.Day ? "Kun (12:00-16:00)" : "Kechqurun (17:00-22:00)";
     }
 }

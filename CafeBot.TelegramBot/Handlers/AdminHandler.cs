@@ -45,7 +45,7 @@ public class AdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Xush kelibsiz в админ-панель!",
+            text: "Xush kelibsiz admin paneliga!",
             replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
             cancellationToken: cancellationToken);
     }
@@ -94,7 +94,7 @@ public class AdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: callbackQuery.Message.MessageId,
-                        text: "Вы вернулись в главное меню.",
+                        text: "Siz asosiy menyuga qaytdingiz.",
                         replyMarkup: null,
                         cancellationToken: cancellationToken);
                     break;
@@ -102,7 +102,7 @@ public class AdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: callbackQuery.Message.MessageId,
-                        text: "Вы вернулись в админ-панель.",
+                        text: "Siz admin paneliga qaytdingiz.",
                         replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -111,7 +111,7 @@ public class AdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: callbackQuery.Message.MessageId,
-                        text: "Операция отменена. Вы вернулись в главное меню.",
+                        text: "Operatsiya bekor qilindi. Siz asosiy menyuga qaytdingiz.",
                         replyMarkup: null,
                         cancellationToken: cancellationToken);
                     break;
@@ -170,7 +170,7 @@ public class AdminHandler
         }
         else
         {
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Неизвестная команда. Пожалуйста, используйте кнопки.", replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(), cancellationToken: cancellationToken);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Noma'lum buyruq. Iltimos, tugmalardan foydalaning.", replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(), cancellationToken: cancellationToken);
         }
     }
 }

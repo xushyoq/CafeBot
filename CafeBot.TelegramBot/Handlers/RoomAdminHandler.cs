@@ -25,7 +25,7 @@ public class RoomAdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Управление комнатами:",
+            text: "Xonalarni boshqarish:",
             replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
             cancellationToken: cancellationToken);
     }
@@ -37,7 +37,7 @@ public class RoomAdminHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите название комнаты:",
+            text: "Xona nomini kiriting:",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -50,7 +50,7 @@ public class RoomAdminHandler
         _userStateManager.SetState(userId, UserState.AdminAddingRoomNumber);
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите номер комнаты (число, или '-' для пропуска):",
+            text: "Xona raqamini kiriting (raqam, yoki '-' belgisi bilan o'tkazib yuborish uchun):",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -71,7 +71,7 @@ public class RoomAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Noto'g'ri format номера. Введите положительное число или '-' для пропуска:",
+                text: "❌ Raqam formati noto'g'ri. Musbat raqam yoki '-' belgisi bilan o'tkazib yuborish uchun kiriting:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -79,7 +79,7 @@ public class RoomAdminHandler
         _userStateManager.SetState(userId, UserState.AdminAddingRoomCapacity);
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите вместимость комнаты (число человек):",
+            text: "Xona sig'imini kiriting (odamlar soni, raqam):",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -90,7 +90,7 @@ public class RoomAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Noto'g'ri format вместимости. Введите положительное число:",
+                text: "❌ Sig'im formati noto'g'ri. Musbat raqam kiriting:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -101,7 +101,7 @@ public class RoomAdminHandler
         _userStateManager.SetState(userId, UserState.AdminAddingRoomDescription);
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите описание комнаты (или '-' для пропуска):",
+            text: "Xona tavsifini kiriting (yoki '-' belgisi bilan o'tkazib yuborish uchun):",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -114,7 +114,7 @@ public class RoomAdminHandler
         _userStateManager.SetState(userId, UserState.AdminAddingRoomPhotoUrl);
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Введите URL фото комнаты (или '-' для пропуска):",
+            text: "Xona rasmi URL manzilini kiriting (yoki '-' belgisi bilan o'tkazib yuborish uchun):",
             replyMarkup: new ForceReplyMarkup { Selective = true },
             cancellationToken: cancellationToken);
     }
@@ -128,7 +128,7 @@ public class RoomAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Ошибка: не все данные заполнены. Начните заново.",
+                text: "❌ Xatolik: barcha ma'lumotlar to'ldirilmagan. Qaytadan boshlang.",
                 replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                 cancellationToken: cancellationToken);
             _userStateManager.ClearState(userId);
@@ -146,7 +146,7 @@ public class RoomAdminHandler
 
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"✅ Комната '{room.Name}' успешно создана!",
+                text: $"✅ '{room.Name}' xonasi muvaffaqiyatli yaratildi!",
                 replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                 cancellationToken: cancellationToken);
 
@@ -156,7 +156,7 @@ public class RoomAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при создании комнаты: {ex.Message}",
+                text: $"❌ Xona yaratishda xatolik: {ex.Message}",
                 replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                 cancellationToken: cancellationToken);
             _userStateManager.ClearState(userId);
@@ -173,7 +173,7 @@ public class RoomAdminHandler
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "🏠 В данный момент нет активных комнат.",
+                    text: "🏠 Hozirda faol xonalar yo'q.",
                     replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                     cancellationToken: cancellationToken);
                 return;
@@ -182,7 +182,7 @@ public class RoomAdminHandler
             // Отправляем заголовок
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "🏠 Список комнат:",
+                text: "🏠 Xonalar ro'yxati:",
                 replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                 cancellationToken: cancellationToken);
 
@@ -193,8 +193,8 @@ public class RoomAdminHandler
                 if (room.Number.HasValue)
                     message += $" (№{room.Number})";
                 message += $"\n";
-                message += $"   Вместимость: {room.Capacity} чел.\n";
-                message += $"   Статус: {(room.Status == RoomStatus.Active ? "✅ Активна" : "❌ Неактивна")}\n";
+                message += $"   Sig'im: {room.Capacity} kishi\n";
+                message += $"   Holat: {(room.Status == RoomStatus.Active ? "✅ Faol" : "❌ Faol emas")}\n";
                 if (!string.IsNullOrEmpty(room.Description))
                     message += $"   Tavsif: {room.Description}\n";
                 message += $"   ID: {room.Id}";
@@ -203,12 +203,12 @@ public class RoomAdminHandler
                 {
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("✏️ Редактировать", $"edit_room_{room.Id}"),
+                        InlineKeyboardButton.WithCallbackData("✏️ Tahrirlash", $"edit_room_{room.Id}"),
                         InlineKeyboardButton.WithCallbackData("🗑️ O'chirish", $"delete_room_{room.Id}")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("🔄 Статус", $"toggle_room_{room.Id}")
+                        InlineKeyboardButton.WithCallbackData("🔄 Holat", $"toggle_room_{room.Id}")
                     }
                 });
 
@@ -223,7 +223,7 @@ public class RoomAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при получении списка комнат: {ex.Message}",
+                text: $"❌ Xonalar ro'yxatini olishda xatolik: {ex.Message}",
                 replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                 cancellationToken: cancellationToken);
         }
@@ -247,26 +247,26 @@ public class RoomAdminHandler
             await _botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId,
-                text: $"✏️ Редактирование комнаты '{room.Name}'\n\nТекущие данные:\nNomi: {room.Name}\nНомер: {room.Number?.ToString() ?? "Нет"}\nВместимость: {room.Capacity} чел.\nTavsif: {room.Description ?? "Нет"}\nСтатус: {(room.Status == RoomStatus.Active ? "Активна" : "Неактивна")}\n\nЧто изменить?",
+                text: $"✏️ Xona '{room.Name}'ni tahrirlash\n\nJoriy ma'lumotlar:\nNomi: {room.Name}\nRaqam: {room.Number?.ToString() ?? "Yo'q"}\nSig'im: {room.Capacity} kishi\nTavsif: {room.Description ?? "Yo'q"}\nHolat: {(room.Status == RoomStatus.Active ? "Faol" : "Faol emas")}\n\nNima o'zgartirmoqchisiz?",
                 replyMarkup: new InlineKeyboardMarkup(new[]
                 {
                     new[]
                     {
                         InlineKeyboardButton.WithCallbackData("📝 Nomi", $"edit_room_name_{roomId}"),
-                        InlineKeyboardButton.WithCallbackData("🔢 Номер", $"edit_room_number_{roomId}")
+                        InlineKeyboardButton.WithCallbackData("🔢 Raqam", $"edit_room_number_{roomId}")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("👥 Вместимость", $"edit_room_capacity_{roomId}"),
+                        InlineKeyboardButton.WithCallbackData("👥 Sig'im", $"edit_room_capacity_{roomId}"),
                         InlineKeyboardButton.WithCallbackData("📄 Tavsif", $"edit_room_desc_{roomId}")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("🔄 Статус", $"toggle_room_{roomId}")
+                        InlineKeyboardButton.WithCallbackData("🔄 Holat", $"toggle_room_{roomId}")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("⬅️ Назад", "admin_list_rooms")
+                        InlineKeyboardButton.WithCallbackData("⬅️ Orqaga", "admin_list_rooms")
                     }
                 }),
                 cancellationToken: cancellationToken);
@@ -287,7 +287,7 @@ public class RoomAdminHandler
             await _botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId,
-                text: $"🗑️ Вы уверены, что хотите удалить комнату '{room.Name}'?\n\n⚠️ Это действие нельзя отменить!\n⚠️ Все активные заказы в этой комнате будут отменены!",
+                text: $"🗑️ Siz haqiqatan ham '{room.Name}' xonasini o'chirmoqchimisiz?\n\n⚠️ Bu harakatni bekor qilib bo'lmaydi!\n⚠️ Bu xonadagi barcha faol buyurtmalar bekor qilinadi!",
                 replyMarkup: KeyboardBuilder.YesNoKeyboard("confirm_delete_room", roomId),
                 cancellationToken: cancellationToken);
         }
@@ -314,10 +314,10 @@ public class RoomAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: $"✅ Комната '{room.Name}' теперь {(newStatus == RoomStatus.Active ? "активна" : "неактивна")}.",
+                        text: $"✅ Xona '{room.Name}' endi {(newStatus == RoomStatus.Active ? "faol" : "faol emas")}.",
                         replyMarkup: new InlineKeyboardMarkup(new[]
                         {
-                            InlineKeyboardButton.WithCallbackData("⬅️ К списку комнат", "admin_list_rooms")
+                            InlineKeyboardButton.WithCallbackData("⬅️ Xonalar ro'yxatiga", "admin_list_rooms")
                         }),
                         cancellationToken: cancellationToken);
                 }
@@ -337,7 +337,7 @@ public class RoomAdminHandler
             try
             {
                 var room = await _roomService.GetRoomByIdAsync(roomId);
-                var roomName = room?.Name ?? "Неизвестная комната";
+                var roomName = room?.Name ?? "Noma'lum xona";
 
                 var success = await _roomService.DeleteRoomAsync(roomId);
 
@@ -346,10 +346,10 @@ public class RoomAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: $"✅ Комната '{roomName}' успешно удалена!",
+                        text: $"✅ '{roomName}' xonasi muvaffaqiyatli o'chirildi!",
                         replyMarkup: new InlineKeyboardMarkup(new[]
                         {
-                            InlineKeyboardButton.WithCallbackData("⬅️ К списку комнат", "admin_list_rooms")
+                            InlineKeyboardButton.WithCallbackData("⬅️ Xonalar ro'yxatiga", "admin_list_rooms")
                         }),
                         cancellationToken: cancellationToken);
                 }
@@ -358,10 +358,10 @@ public class RoomAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "❌ Не удалось удалить комнату.",
+                        text: "❌ Xonani o'chirib bo'lmadi.",
                         replyMarkup: new InlineKeyboardMarkup(new[]
                         {
-                            InlineKeyboardButton.WithCallbackData("⬅️ К списку комнат", "admin_list_rooms")
+                            InlineKeyboardButton.WithCallbackData("⬅️ Xonalar ro'yxatiga", "admin_list_rooms")
                         }),
                         cancellationToken: cancellationToken);
                 }
@@ -371,10 +371,10 @@ public class RoomAdminHandler
                 await _botClient.EditMessageTextAsync(
                     chatId: chatId,
                     messageId: messageId,
-                    text: $"❌ Ошибка при удалении комнаты: {ex.Message}",
+                    text: $"❌ Xona o'chirishda xatolik: {ex.Message}",
                     replyMarkup: new InlineKeyboardMarkup(new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("⬅️ К списку комнат", "admin_list_rooms")
+                        InlineKeyboardButton.WithCallbackData("⬅️ Xonalar ro'yxatiga", "admin_list_rooms")
                     }),
                     cancellationToken: cancellationToken);
             }
@@ -386,10 +386,10 @@ public class RoomAdminHandler
         await _botClient.EditMessageTextAsync(
             chatId: chatId,
             messageId: messageId,
-            text: "❌ Удаление комнаты отменено.",
+            text: "❌ Xona o'chirish bekor qilindi.",
             replyMarkup: new InlineKeyboardMarkup(new[]
             {
-                InlineKeyboardButton.WithCallbackData("⬅️ К списку комнат", "admin_list_rooms")
+                InlineKeyboardButton.WithCallbackData("⬅️ Xonalar ro'yxatiga", "admin_list_rooms")
             }),
             cancellationToken: cancellationToken);
     }
@@ -415,11 +415,11 @@ public class RoomAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "Введите новое название комнаты:",
+                        text: "Xona uchun yangi nom kiriting:",
                         cancellationToken: cancellationToken);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "Введите новое название комнаты:",
+                        text: "Xona uchun yangi nom kiriting:",
                         replyMarkup: new ForceReplyMarkup { Selective = true },
                         cancellationToken: cancellationToken);
                     break;
@@ -428,11 +428,11 @@ public class RoomAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "Введите новый номер комнаты (число или '-' для удаления):",
+                        text: "Xona uchun yangi raqam kiriting (raqam yoki '-' belgisi bilan o'chirish uchun):",
                         cancellationToken: cancellationToken);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "Введите новый номер комнаты (число или '-' для удаления):",
+                        text: "Xona uchun yangi raqam kiriting (raqam yoki '-' belgisi bilan o'chirish uchun):",
                         replyMarkup: new ForceReplyMarkup { Selective = true },
                         cancellationToken: cancellationToken);
                     break;
@@ -441,11 +441,11 @@ public class RoomAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "Введите новую вместимость комнаты (число человек):",
+                        text: "Xona uchun yangi sig'im kiriting (odamlar soni, raqam):",
                         cancellationToken: cancellationToken);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "Введите новую вместимость комнаты (число человек):",
+                        text: "Xona uchun yangi sig'im kiriting (odamlar soni, raqam):",
                         replyMarkup: new ForceReplyMarkup { Selective = true },
                         cancellationToken: cancellationToken);
                     break;
@@ -454,11 +454,11 @@ public class RoomAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "Введите новое описание комнаты (или '-' для удаления):",
+                        text: "Xona uchun yangi tavsif kiriting (yoki '-' belgisi bilan o'chirish uchun):",
                         cancellationToken: cancellationToken);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "Введите новое описание комнаты (или '-' для удаления):",
+                        text: "Xona uchun yangi tavsif kiriting (yoki '-' belgisi bilan o'chirish uchun):",
                         replyMarkup: new ForceReplyMarkup { Selective = true },
                         cancellationToken: cancellationToken);
                     break;
@@ -466,7 +466,7 @@ public class RoomAdminHandler
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: messageId,
-                        text: "Неизвестное поле для редактирования.",
+                        text: "Tahrirlash uchun noma'lum maydon.",
                         replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                         cancellationToken: cancellationToken);
                     _userStateManager.ClearState(userId);
@@ -576,7 +576,7 @@ public class RoomAdminHandler
                     await _roomService.UpdateRoomAsync(roomId, messageText, null, null, null, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Nomi комнаты успешно обновлено!",
+                        text: "✅ Xona nomi muvaffaqiyatli yangilandi!",
                         replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -588,7 +588,7 @@ public class RoomAdminHandler
                         {
                             await _botClient.SendTextMessageAsync(
                                 chatId: chatId,
-                                text: "❌ Noto'g'ri format. Введите число для номера комнаты или '-' для удаления:",
+                                text: "❌ Formati noto'g'ri. Xona raqami uchun raqam yoki '-' belgisi bilan o'chirish uchun kiriting:",
                                 cancellationToken: cancellationToken);
                             return;
                         }
@@ -598,7 +598,7 @@ public class RoomAdminHandler
                     await _roomService.UpdateRoomAsync(roomId, null, roomNumber, null, null, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Номер комнаты успешно обновлен!",
+                        text: "✅ Xona raqami muvaffaqiyatli yangilandi!",
                         replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -607,14 +607,14 @@ public class RoomAdminHandler
                     {
                         await _botClient.SendTextMessageAsync(
                             chatId: chatId,
-                            text: "❌ Noto'g'ri format. Введите положительное число для вместимости:",
+                            text: "❌ Formati noto'g'ri. Sig'im uchun musbat raqam kiriting:",
                             cancellationToken: cancellationToken);
                         return;
                     }
                     await _roomService.UpdateRoomAsync(roomId, null, null, capacity, null, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Вместимость комнаты успешно обновлена!",
+                        text: "✅ Xona sig'imi muvaffaqiyatli yangilandi!",
                         replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -623,7 +623,7 @@ public class RoomAdminHandler
                     await _roomService.UpdateRoomAsync(roomId, null, null, null, description, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Tavsif комнаты успешно обновлено!",
+                        text: "✅ Xona tavsifi muvaffaqiyatli yangilandi!",
                         replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -632,7 +632,7 @@ public class RoomAdminHandler
                     await _roomService.UpdateRoomAsync(roomId, null, null, null, null, photoUrl, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Фото комнаты успешно обновлено!",
+                        text: "✅ Xona rasmi muvaffaqiyatli yangilandi!",
                         replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -644,7 +644,7 @@ public class RoomAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"❌ Ошибка при обновлении комнаты: {ex.Message}",
+                text: $"❌ Xona yangilanishida xatolik: {ex.Message}",
                 replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                 cancellationToken: cancellationToken);
             _userStateManager.ClearState(userId);
