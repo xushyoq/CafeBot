@@ -338,6 +338,8 @@ docker-compose up
 - [Changelog](CHANGELOG.md) - История изменений
 - [Makefile](Makefile) - Команды для разработки
 - [Docker Setup](docker-compose.yml) - Конфигурация Docker
+- [English Documentation](README.en.md) - Документация на английском
+- [O'zbek Dokumentatsiyasi](README.uz.md) - Ўзбекча документация
 
 ## 🏗️ Архитектура проекта
 
