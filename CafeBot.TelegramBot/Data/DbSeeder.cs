@@ -12,19 +12,19 @@ public static class DbSeeder
         // Проверяем есть ли уже данные
         if (await context.Employees.AnyAsync() || await context.Rooms.AnyAsync())
         {
-            Console.WriteLine("База данных уже содержит данные. Пропускаем seed.");
+            Console.WriteLine("Ma'lumotlar bazasi allaqachon ma'lumotlarni o'z ichiga oladi. Seed o'tkazib yuboriladi.");
             return;
         }
 
-        Console.WriteLine("Заполняем базу данных тестовыми данными...");
+        Console.WriteLine("Ma'lumotlar bazasini test ma'lumotlari bilan to'ldirish...");
 
-        // Добавляем работника (для тестирования)
-        // ВАЖНО: Замените 123456789 на ваш реальный Telegram ID!
+        // Xodim qo'shamiz (test uchun)
+        // MUHIM: 123456789 ni sizning haqiqiy Telegram ID ga o'zgartiring!
         var employee = new Employee
         {
-            TelegramId = 8094668102, // ← ЗАМЕНИТЕ НА ВАШ TELEGRAM ID!
-            FirstName = "Админ",
-            LastName = "Тестовый",
+            TelegramId = 8094668102, // ← SIZNING TELEGRAM ID GA O'ZGARTIRING!
+            FirstName = "Admin",
+            LastName = "Test",
             Phone = "+998901234567",
             Role = EmployeeRole.Admin,
             IsActive = true,
@@ -32,117 +32,117 @@ public static class DbSeeder
         };
         context.Employees.Add(employee);
 
-        // Добавляем комнаты
+        // Xonalarni qo'shamiz
         var rooms = new[]
         {
-            new Room { Name = "VIP зал №1", Capacity = 10, Status = RoomStatus.Active, Description = "Большой VIP зал с караоке" },
-            new Room { Name = "Малый зал", Capacity = 6, Status = RoomStatus.Active, Description = "Уютный зал для небольших компаний" },
-            new Room { Name = "Караоке", Capacity = 8, Status = RoomStatus.Active, Description = "Зал с профессиональной караоке системой" },
-            new Room { Name = "Семейный", Capacity = 12, Status = RoomStatus.Active, Description = "Просторный зал для семейных мероприятий" }
+            new Room { Name = "VIP zal №1", Capacity = 10, Status = RoomStatus.Active, Description = "Karaoke bilan katta VIP zal" },
+            new Room { Name = "Kichik zal", Capacity = 6, Status = RoomStatus.Active, Description = "Kichik kompaniyalar uchun shinam zal" },
+            new Room { Name = "Karaoke", Capacity = 8, Status = RoomStatus.Active, Description = "Professional karaoke tizimi bilan zal" },
+            new Room { Name = "Oila", Capacity = 12, Status = RoomStatus.Active, Description = "Oila tadbirlari uchun keng zal" }
         };
         context.Rooms.AddRange(rooms);
 
-        // Добавляем категории
-        var categoryFood = new Category { Name = "Еда", DisplayOrder = 1, IsActive = true };
-        var categoryDrinks = new Category { Name = "Напитки", DisplayOrder = 2, IsActive = true };
+        // Kategoriyalarni qo'shamiz
+        var categoryFood = new Category { Name = "Taomlar", DisplayOrder = 1, IsActive = true };
+        var categoryDrinks = new Category { Name = "Ichimliklar", DisplayOrder = 2, IsActive = true };
         context.Categories.AddRange(categoryFood, categoryDrinks);
 
         await context.SaveChangesAsync();
 
-        // Добавляем продукты (еда)
+        // Mahsulotlarni qo'shamiz (taomlar)
         var products = new[]
         {
-            new Product 
-            { 
-                CategoryId = categoryFood.Id, 
-                Name = "Шашлык из баранины", 
-                Price = 25000, 
+            new Product
+            {
+                CategoryId = categoryFood.Id,
+                Name = "Qo'zi go'shtidan shashlik",
+                Price = 25000,
                 Unit = ProductUnit.Kg,
-                Description = "Сочный шашлык из молодой баранины",
-                IsAvailable = true 
+                Description = "Yosh qo'zi go'shtidan suvli shashlik",
+                IsAvailable = true
             },
-            new Product 
-            { 
-                CategoryId = categoryFood.Id, 
-                Name = "Шашлык из курицы", 
-                Price = 18000, 
+            new Product
+            {
+                CategoryId = categoryFood.Id,
+                Name = "Tovuq go'shtidan shashlik",
+                Price = 18000,
                 Unit = ProductUnit.Kg,
-                Description = "Нежный куриный шашлык",
-                IsAvailable = true 
+                Description = "Nazoratli tovuq go'shti shashligi",
+                IsAvailable = true
             },
-            new Product 
-            { 
-                CategoryId = categoryFood.Id, 
-                Name = "Плов", 
-                Price = 22000, 
+            new Product
+            {
+                CategoryId = categoryFood.Id,
+                Name = "Palov",
+                Price = 22000,
                 Unit = ProductUnit.Kg,
-                Description = "Традиционный узбекский плов",
-                IsAvailable = true 
+                Description = "An'anaviy o'zbek palovi",
+                IsAvailable = true
             },
-            new Product 
-            { 
-                CategoryId = categoryFood.Id, 
-                Name = "Салат Ачик-чучук", 
-                Price = 15000, 
+            new Product
+            {
+                CategoryId = categoryFood.Id,
+                Name = "Achichuk salat",
+                Price = 15000,
                 Unit = ProductUnit.Gram,
-                Description = "Свежий салат из помидоров и лука (300г)",
-                IsAvailable = true 
+                Description = "Pomidor va piyozdan yangi salat (300g)",
+                IsAvailable = true
             },
-            new Product 
-            { 
-                CategoryId = categoryFood.Id, 
-                Name = "Лагман", 
-                Price = 20000, 
+            new Product
+            {
+                CategoryId = categoryFood.Id,
+                Name = "Lag'mon",
+                Price = 20000,
                 Unit = ProductUnit.Piece,
-                Description = "Лагман с мясом и овощами",
-                IsAvailable = true 
+                Description = "Go'sht va sabzavot bilan lag'mon",
+                IsAvailable = true
             },
             
-            // Напитки
-            new Product 
-            { 
-                CategoryId = categoryDrinks.Id, 
-                Name = "Кола", 
-                Price = 8000, 
+            // Ichimliklar
+            new Product
+            {
+                CategoryId = categoryDrinks.Id,
+                Name = "Kola",
+                Price = 8000,
                 Unit = ProductUnit.Piece,
-                Description = "Coca-Cola 0.5л",
-                IsAvailable = true 
+                Description = "Coca-Cola 0.5l",
+                IsAvailable = true
             },
-            new Product 
-            { 
-                CategoryId = categoryDrinks.Id, 
-                Name = "Чай черный", 
-                Price = 5000, 
+            new Product
+            {
+                CategoryId = categoryDrinks.Id,
+                Name = "Qora choy",
+                Price = 5000,
                 Unit = ProductUnit.Piece,
-                Description = "Чайник черного чая",
-                IsAvailable = true 
+                Description = "Qora choy uchun choynak",
+                IsAvailable = true
             },
-            new Product 
-            { 
-                CategoryId = categoryDrinks.Id, 
-                Name = "Чай зеленый", 
-                Price = 5000, 
+            new Product
+            {
+                CategoryId = categoryDrinks.Id,
+                Name = "Yashil choy",
+                Price = 5000,
                 Unit = ProductUnit.Piece,
-                Description = "Чайник зеленого чая",
-                IsAvailable = true 
+                Description = "Yashil choy uchun choynak",
+                IsAvailable = true
             },
-            new Product 
-            { 
-                CategoryId = categoryDrinks.Id, 
-                Name = "Сок", 
-                Price = 10000, 
+            new Product
+            {
+                CategoryId = categoryDrinks.Id,
+                Name = "Sharbat",
+                Price = 10000,
                 Unit = ProductUnit.Piece,
-                Description = "Натуральный сок 1л",
-                IsAvailable = true 
+                Description = "Tabiiy sharbat 1l",
+                IsAvailable = true
             },
-            new Product 
-            { 
-                CategoryId = categoryDrinks.Id, 
-                Name = "Вода минеральная", 
-                Price = 4000, 
+            new Product
+            {
+                CategoryId = categoryDrinks.Id,
+                Name = "Mineral suv",
+                Price = 4000,
                 Unit = ProductUnit.Piece,
-                Description = "Минеральная вода 0.5л",
-                IsAvailable = true 
+                Description = "Mineral suv 0.5l",
+                IsAvailable = true
             }
         };
         

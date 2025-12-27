@@ -71,7 +71,7 @@ public class RoomAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Неверный формат номера. Введите положительное число или '-' для пропуска:",
+                text: "❌ Noto'g'ri format номера. Введите положительное число или '-' для пропуска:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -90,7 +90,7 @@ public class RoomAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Неверный формат вместимости. Введите положительное число:",
+                text: "❌ Noto'g'ri format вместимости. Введите положительное число:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -196,7 +196,7 @@ public class RoomAdminHandler
                 message += $"   Вместимость: {room.Capacity} чел.\n";
                 message += $"   Статус: {(room.Status == RoomStatus.Active ? "✅ Активна" : "❌ Неактивна")}\n";
                 if (!string.IsNullOrEmpty(room.Description))
-                    message += $"   Описание: {room.Description}\n";
+                    message += $"   Tavsif: {room.Description}\n";
                 message += $"   ID: {room.Id}";
 
                 var buttons = new InlineKeyboardMarkup(new[]
@@ -204,7 +204,7 @@ public class RoomAdminHandler
                     new[]
                     {
                         InlineKeyboardButton.WithCallbackData("✏️ Редактировать", $"edit_room_{room.Id}"),
-                        InlineKeyboardButton.WithCallbackData("🗑️ Удалить", $"delete_room_{room.Id}")
+                        InlineKeyboardButton.WithCallbackData("🗑️ O'chirish", $"delete_room_{room.Id}")
                     },
                     new[]
                     {
@@ -247,18 +247,18 @@ public class RoomAdminHandler
             await _botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId,
-                text: $"✏️ Редактирование комнаты '{room.Name}'\n\nТекущие данные:\nНазвание: {room.Name}\nНомер: {room.Number?.ToString() ?? "Нет"}\nВместимость: {room.Capacity} чел.\nОписание: {room.Description ?? "Нет"}\nСтатус: {(room.Status == RoomStatus.Active ? "Активна" : "Неактивна")}\n\nЧто изменить?",
+                text: $"✏️ Редактирование комнаты '{room.Name}'\n\nТекущие данные:\nNomi: {room.Name}\nНомер: {room.Number?.ToString() ?? "Нет"}\nВместимость: {room.Capacity} чел.\nTavsif: {room.Description ?? "Нет"}\nСтатус: {(room.Status == RoomStatus.Active ? "Активна" : "Неактивна")}\n\nЧто изменить?",
                 replyMarkup: new InlineKeyboardMarkup(new[]
                 {
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("📝 Название", $"edit_room_name_{roomId}"),
+                        InlineKeyboardButton.WithCallbackData("📝 Nomi", $"edit_room_name_{roomId}"),
                         InlineKeyboardButton.WithCallbackData("🔢 Номер", $"edit_room_number_{roomId}")
                     },
                     new[]
                     {
                         InlineKeyboardButton.WithCallbackData("👥 Вместимость", $"edit_room_capacity_{roomId}"),
-                        InlineKeyboardButton.WithCallbackData("📄 Описание", $"edit_room_desc_{roomId}")
+                        InlineKeyboardButton.WithCallbackData("📄 Tavsif", $"edit_room_desc_{roomId}")
                     },
                     new[]
                     {
@@ -576,7 +576,7 @@ public class RoomAdminHandler
                     await _roomService.UpdateRoomAsync(roomId, messageText, null, null, null, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Название комнаты успешно обновлено!",
+                        text: "✅ Nomi комнаты успешно обновлено!",
                         replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -588,7 +588,7 @@ public class RoomAdminHandler
                         {
                             await _botClient.SendTextMessageAsync(
                                 chatId: chatId,
-                                text: "❌ Неверный формат. Введите число для номера комнаты или '-' для удаления:",
+                                text: "❌ Noto'g'ri format. Введите число для номера комнаты или '-' для удаления:",
                                 cancellationToken: cancellationToken);
                             return;
                         }
@@ -607,7 +607,7 @@ public class RoomAdminHandler
                     {
                         await _botClient.SendTextMessageAsync(
                             chatId: chatId,
-                            text: "❌ Неверный формат. Введите положительное число для вместимости:",
+                            text: "❌ Noto'g'ri format. Введите положительное число для вместимости:",
                             cancellationToken: cancellationToken);
                         return;
                     }
@@ -623,7 +623,7 @@ public class RoomAdminHandler
                     await _roomService.UpdateRoomAsync(roomId, null, null, null, description, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Описание комнаты успешно обновлено!",
+                        text: "✅ Tavsif комнаты успешно обновлено!",
                         replyMarkup: KeyboardBuilder.ManageRoomsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;

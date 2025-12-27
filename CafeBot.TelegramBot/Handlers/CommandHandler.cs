@@ -47,7 +47,7 @@ public class CommandHandler
             default:
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "❓ Неизвестная команда. Используйте /help для списка команд.",
+                    text: "❓ Noma'lum buyruq. Buyruqlar ro'yxati uchun /help dan foydalaning.",
                     cancellationToken: cancellationToken
                 );
                 break;
@@ -63,8 +63,8 @@ public class CommandHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ У вас нет доступа к боту.\n\n" +
-                      "Обратитесь к администратору для получения доступа.",
+                text: "❌ Sizda botga kirish huquqi yo'q.\n\n" +
+                      "Kirish huquqini olish uchun administrator bilan bog'laning.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -74,18 +74,18 @@ public class CommandHandler
         _stateManager.ClearState(telegramId);
 
         var isAdmin = employee.Role == Core.Enums.EmployeeRole.Admin;
-        var greeting = $"👋 Добро пожаловать, {employee.FirstName}!\n\n";
+        var greeting = $"👋 Xush kelibsiz, {employee.FirstName}!\n\n";
 
         if (isAdmin)
         {
-            greeting += "🔧 Вы вошли как администратор.\n";
+            greeting += "🔧 Siz admin sifatida kirdingiz.\n";
         }
         else
         {
-            greeting += "👔 Вы вошли как официант.\n";
+            greeting += "👔 Siz ofitsiant sifatida kirdingiz.\n";
         }
 
-        greeting += "\nВыберите действие:";
+        greeting += "\nHarakatni tanlang:";
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
@@ -97,14 +97,14 @@ public class CommandHandler
 
     private async Task HandleHelpCommandAsync(long chatId, CancellationToken cancellationToken)
     {
-        var helpText = @"📋 Справка по использованию бота
+        var helpText = @"📋 Botdan foydalanish bo'yicha yo'riqnoma
 
-🆕 Создать заказ - начать новое бронирование
-📝 Мои заказы - просмотр активных заказов
-🏠 Комнаты - список всех комнат
-ℹ️ Помощь - эта справка
+🆕 Buyurtma yaratish - yangi bron qilishni boshlash
+📝 Mening buyurtmalarim - faol buyurtmalarni ko'rish
+🏠 Xonalar - barcha xonalar ro'yxati
+ℹ️ Yordam - ushbu yo'riqnoma
 
-Для начала работы используйте /start";
+Ishni boshlash uchun /start dan foydalaning";
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,

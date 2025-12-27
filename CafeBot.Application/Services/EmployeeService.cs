@@ -102,7 +102,7 @@ public class EmployeeService : IEmployeeService
 
     public async Task<IEnumerable<EmployeeStatistics>> GetEmployeesStatisticsAsync(DateTime startDate, DateTime endDate)
     {
-        // Получаем всех активных официантов
+        // Получаем всех активных ofitsiantов
         var employees = await GetActiveEmployeesAsync();
         var waiters = employees.Where(e => e.Role == EmployeeRole.Waiter);
 
@@ -134,7 +134,7 @@ public class EmployeeService : IEmployeeService
 
     public async Task<IEnumerable<EmployeeCurrentStatus>> GetEmployeesCurrentStatusAsync()
     {
-        // Получаем всех активных официантов
+        // Получаем всех активных ofitsiantов
         var employees = await GetActiveEmployeesAsync();
         var waiters = employees.Where(e => e.Role == EmployeeRole.Waiter);
 

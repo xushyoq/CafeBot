@@ -48,7 +48,7 @@ public class OrderFlowHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "📅 Выберите дату бронирования:",
+            text: "📅 Bron qilish sanasini tanlang:",
             replyMarkup: KeyboardBuilder.DateSelectionKeyboard(),
             cancellationToken: cancellationToken
         );
@@ -90,7 +90,7 @@ public class OrderFlowHandler
             _stateManager.ClearState(userId);
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Дозаказ отменен.",
+                text: "❌ Qo'shimcha buyurtma bekor qilindi.",
                 cancellationToken: cancellationToken
             );
             await _botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
@@ -139,7 +139,7 @@ public class OrderFlowHandler
             _logger.LogError(ex, "Error handling callback");
             await _botClient.AnswerCallbackQueryAsync(
                 callbackQuery.Id,
-                text: "❌ Произошла ошибка. Попробуйте еще раз.",
+                text: "❌ Xatolik yuz berdi. Qaytadan urinib ko'ring.",
                 showAlert: true,
                 cancellationToken: cancellationToken
             );
@@ -156,7 +156,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Неверный формат даты. Попробуйте еще раз.",
+                text: "❌ Noto'g'ri format даты. Qaytadan urinib ko'ring.",
                 cancellationToken: cancellationToken
             );
             return;
@@ -351,7 +351,7 @@ public class OrderFlowHandler
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
             text: $"✅ Выбрано: {product?.Name}\n" +
-                  $"💰 Цена: {product?.Price:N0} сум/{GetUnitShortName(product!.Unit)}\n\n" +
+                  $"💰 Narx: {product?.Price:N0} сум/{GetUnitShortName(product!.Unit)}\n\n" +
                   $"📝 Введите количество ({GetUnitShortName(product.Unit)}):",
             replyMarkup: KeyboardBuilder.CancelButton(),
             cancellationToken: cancellationToken
@@ -381,7 +381,7 @@ public class OrderFlowHandler
 
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "📋 Выберите категорию блюд:",
+            text: "📋 Taomlar kategoriyasini tanlang:",
             replyMarkup: keyboard,
             cancellationToken: cancellationToken
         );
@@ -438,7 +438,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Имя не может быть пустым. Попробуйте еще раз:",
+                text: "❌ Имя не может быть пустым. Qaytadan urinib ko'ring:",
                 cancellationToken: cancellationToken
             );
             return;
@@ -463,7 +463,7 @@ public class OrderFlowHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Телефон не может быть пустым. Попробуйте еще раз:",
+                text: "❌ Телефон не может быть пустым. Qaytadan urinib ko'ring:",
                 cancellationToken: cancellationToken
             );
             return;
@@ -738,7 +738,7 @@ public class OrderFlowHandler
         chatId: chatId,
         text: $"➕ Дозаказ к заказу #{order.OrderNumber}\n\n" +
               $"Текущая сумма: {order.TotalAmount:N0} сум\n\n" +
-              "Выберите категорию для добавления блюд:",
+              "Taomlar qo'shish uchun kategoriyani tanlang:",
         cancellationToken: cancellationToken
     );
 

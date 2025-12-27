@@ -52,7 +52,7 @@ public class RoomHandler
                 RoomStatus.Maintenance => "🛠️ На обслуживании",
                 _ => "Неизвестно"
             }}");
-            roomList.AppendLine($"  Описание: {room.Description ?? "Нет описания"}");
+            roomList.AppendLine($"  Tavsif: {room.Description ?? "Нет описания"}");
             roomList.AppendLine();
         }
 

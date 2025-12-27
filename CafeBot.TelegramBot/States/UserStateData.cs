@@ -73,7 +73,7 @@ public class UserStateData
         CurrentOrderId = null;
         Cart.Clear();
 
-        // Очистка данных администратора
+        // Очистка данных adminа
         AdminEmployeeTelegramId = null;
         AdminEmployeeFirstName = null;
         AdminEmployeeLastName = null;

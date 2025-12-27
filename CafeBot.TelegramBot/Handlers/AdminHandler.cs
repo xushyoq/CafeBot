@@ -45,7 +45,7 @@ public class AdminHandler
     {
         await _botClient.SendTextMessageAsync(
             chatId: chatId,
-            text: "Добро пожаловать в админ-панель!",
+            text: "Xush kelibsiz в админ-панель!",
             replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
             cancellationToken: cancellationToken);
     }

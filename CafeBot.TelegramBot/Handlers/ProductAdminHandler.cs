@@ -67,7 +67,7 @@ public class ProductAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Неверный формат. Введите ID категории (число):",
+                text: "❌ Noto'g'ri format. Введите ID категории (число):",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -77,7 +77,7 @@ public class ProductAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Категория с таким ID не найдена. Попробуйте еще раз:",
+                text: "❌ Kategoriya с таким ID не найдена. Qaytadan urinib ko'ring:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -125,7 +125,7 @@ public class ProductAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Неверный формат цены. Введите положительное число:",
+                text: "❌ Noto'g'ri format цены. Введите положительное число:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -212,7 +212,7 @@ public class ProductAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Неверный формат. Введите число для порядка отображения:",
+                text: "❌ Noto'g'ri format. Введите число для порядка отображения:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -295,11 +295,11 @@ public class ProductAdminHandler
             {
                 var categoryName = categoryDict.ContainsKey(product.CategoryId) ? categoryDict[product.CategoryId] : "Неизвестная категория";
                 var message = $"🛒 {product.Name}\n";
-                message += $"   Категория: {categoryName}\n";
-                message += $"   Цена: {product.Price:N0} сум\n";
+                message += $"   Kategoriya: {categoryName}\n";
+                message += $"   Narx: {product.Price:N0} сум\n";
                 message += $"   Единица: {product.Unit}\n";
                 if (!string.IsNullOrEmpty(product.Description))
-                    message += $"   Описание: {product.Description}\n";
+                    message += $"   Tavsif: {product.Description}\n";
                 message += $"   Доступен: {(product.IsAvailable ? "✅ Да" : "❌ Нет")}\n";
                 message += $"   ID: {product.Id}";
 
@@ -308,11 +308,11 @@ public class ProductAdminHandler
                     new[]
                     {
                         InlineKeyboardButton.WithCallbackData("✏️ Редактировать", $"edit_product_{product.Id}"),
-                        InlineKeyboardButton.WithCallbackData("🗑️ Удалить", $"delete_product_{product.Id}")
+                        InlineKeyboardButton.WithCallbackData("🗑️ O'chirish", $"delete_product_{product.Id}")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("🔄 Доступность", $"toggle_product_{product.Id}")
+                        InlineKeyboardButton.WithCallbackData("🔄 Mavjudсть", $"toggle_product_{product.Id}")
                     }
                 });
 
@@ -351,23 +351,23 @@ public class ProductAdminHandler
             await _botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId,
-                text: $"✏️ Редактирование продукта '{product.Name}'\n\nТекущие данные:\nКатегория: {product.Category?.Name ?? "Неизвестная"}\nЦена: {product.Price:N0} сум\nЕдиница: {product.Unit}\nОписание: {product.Description ?? "Нет"}\nПорядок: {product.DisplayOrder}\nДоступен: {(product.IsAvailable ? "Да" : "Нет")}\n\nЧто изменить?",
+                text: $"✏️ Редактирование продукта '{product.Name}'\n\nТекущие данные:\nKategoriya: {product.Category?.Name ?? "Неизвестная"}\nNarx: {product.Price:N0} сум\nЕдиница: {product.Unit}\nTavsif: {product.Description ?? "Нет"}\nПорядок: {product.DisplayOrder}\nДоступен: {(product.IsAvailable ? "Да" : "Нет")}\n\nЧто изменить?",
                 replyMarkup: new InlineKeyboardMarkup(new[]
                 {
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("📝 Название", $"edit_product_name_{productId}"),
-                        InlineKeyboardButton.WithCallbackData("💰 Цена", $"edit_product_price_{productId}")
+                        InlineKeyboardButton.WithCallbackData("📝 Nomi", $"edit_product_name_{productId}"),
+                        InlineKeyboardButton.WithCallbackData("💰 Narx", $"edit_product_price_{productId}")
                     },
                     new[]
                     {
                         InlineKeyboardButton.WithCallbackData("📏 Единица", $"edit_product_unit_{productId}"),
-                        InlineKeyboardButton.WithCallbackData("📄 Описание", $"edit_product_desc_{productId}")
+                        InlineKeyboardButton.WithCallbackData("📄 Tavsif", $"edit_product_desc_{productId}")
                     },
                     new[]
                     {
                         InlineKeyboardButton.WithCallbackData("🔢 Порядок", $"edit_product_order_{productId}"),
-                        InlineKeyboardButton.WithCallbackData("🔄 Доступность", $"toggle_product_{productId}")
+                        InlineKeyboardButton.WithCallbackData("🔄 Mavjudсть", $"toggle_product_{productId}")
                     },
                     new[]
                     {
@@ -672,7 +672,7 @@ public class ProductAdminHandler
                     await _productService.UpdateProductAsync(productId, null, messageText, null, null, null, null, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Название продукта успешно обновлено!",
+                        text: "✅ Nomi продукта успешно обновлено!",
                         replyMarkup: KeyboardBuilder.ManageProductsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -681,7 +681,7 @@ public class ProductAdminHandler
                     await _productService.UpdateProductAsync(productId, null, null, description, null, null, null, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Описание продукта успешно обновлено!",
+                        text: "✅ Tavsif продукта успешно обновлено!",
                         replyMarkup: KeyboardBuilder.ManageProductsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -690,14 +690,14 @@ public class ProductAdminHandler
                     {
                         await _botClient.SendTextMessageAsync(
                             chatId: chatId,
-                            text: "❌ Неверный формат цены. Введите положительное число:",
+                            text: "❌ Noto'g'ri format цены. Введите положительное число:",
                             cancellationToken: cancellationToken);
                         return;
                     }
                     await _productService.UpdateProductAsync(productId, null, null, null, price, null, null, null, null);
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
-                        text: "✅ Цена продукта успешно обновлена!",
+                        text: "✅ Narx продукта успешно обновлена!",
                         replyMarkup: KeyboardBuilder.ManageProductsKeyboard(),
                         cancellationToken: cancellationToken);
                     break;
@@ -706,7 +706,7 @@ public class ProductAdminHandler
                     {
                         await _botClient.SendTextMessageAsync(
                             chatId: chatId,
-                            text: "❌ Неверный формат. Введите число для порядка отображения:",
+                            text: "❌ Noto'g'ri format. Введите число для порядка отображения:",
                             cancellationToken: cancellationToken);
                         return;
                     }

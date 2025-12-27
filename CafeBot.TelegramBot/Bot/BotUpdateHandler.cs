@@ -90,14 +90,14 @@ public class BotUpdateHandler : IUpdateHandler
         }
 
         // Проверяем кнопки главного меню
-        if (messageText == "🆕 Создать заказ")
+        if (messageText == "🆕 Buyurtma yaratish")
         {
             var employee = await unitOfWork.Employees.GetByTelegramIdAsync(userId);
             if (employee == null || !employee.IsActive)
             {
                 await botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "❌ У вас нет доступа к боту.",
+                    text: "❌ Sizda kirish huquqi yo'q к боту.",
                     cancellationToken: cancellationToken
                 );
                 return;
@@ -107,27 +107,27 @@ public class BotUpdateHandler : IUpdateHandler
             return;
         }
 
-        if (messageText == "📝 Мои заказы")
+        if (messageText == "📝 Mening buyurtmalarim")
         {
             var orderListHandler = scope.ServiceProvider.GetRequiredService<OrderListHandler>();
             await orderListHandler.ShowMyOrdersAsync(chatId, userId, cancellationToken);
             return;
         }
 
-        if (messageText == "🏠 Комнаты")
+        if (messageText == "🏠 Xonalar")
         {
             await roomHandler.HandleRoomCommand(message, cancellationToken);
             return;
         }
 
-        if (messageText == "ℹ️ Помощь")
+        if (messageText == "ℹ️ Yordam")
         {
             await commandHandler.HandleCommandAsync(new Message { Text = "/help", Chat = message.Chat, From = message.From }, cancellationToken);
             return;
         }
         
-        // Обработка кнопки "Админ панель"
-        if (messageText == "🔧 Админ панель")
+        // Обработка кнопки "Admin paneli"
+        if (messageText == "🔧 Admin paneli")
         {
             var employee = await _employeeService.GetEmployeeByTelegramIdAsync(userId);
             if (employee?.Role == EmployeeRole.Admin && employee.IsActive)

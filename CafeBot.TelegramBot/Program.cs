@@ -66,7 +66,7 @@ using (var scope = host.Services.CreateScope())
     await DbSeeder.SeedDataAsync(context);
 }
 
-Console.WriteLine("🤖 CafeBot запущен!");
-Console.WriteLine("Нажмите Ctrl+C для остановки...");
+Console.WriteLine("🤖 CafeBot ishga tushdi!");
+Console.WriteLine("To'xtatish uchun Ctrl+C bosing...");
 
 await host.RunAsync();

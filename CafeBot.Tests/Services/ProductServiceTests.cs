@@ -98,7 +98,7 @@ public class ProductServiceTests : TestBase
         await SeedTestData();
         var categoryId = 1;
         var name = "Новый продукт";
-        var description = "Описание нового продукта";
+        var description = "Tavsif нового продукта";
         var price = 15.99m;
         var unit = ProductUnit.Piece;
         var photoUrl = "http://example.com/photo.jpg";

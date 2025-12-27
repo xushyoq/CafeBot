@@ -31,7 +31,7 @@ public class BotBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var me = await _botClient.GetMeAsync(stoppingToken);
-        _logger.LogInformation("Бот запущен: @{BotUsername}", me.Username);
+        _logger.LogInformation("Bot ishga tushdi: @{BotUsername}", me.Username);
 
         var receiverOptions = new ReceiverOptions
         {

@@ -11,13 +11,13 @@ public static class KeyboardBuilder
         {
             new()
             {
-                new KeyboardButton("🆕 Создать заказ"),
-                new KeyboardButton("📝 Мои заказы")
+                new KeyboardButton("🆕 Buyurtma yaratish"),
+                new KeyboardButton("📝 Mening buyurtmalarim")
             },
             new()
             {
-                new KeyboardButton("🏠 Комнаты"),
-                new KeyboardButton("ℹ️ Помощь")
+                new KeyboardButton("🏠 Xonalar"),
+                new KeyboardButton("ℹ️ Yordam")
             }
         };
 
@@ -25,7 +25,7 @@ public static class KeyboardBuilder
         {
             buttons.Add(new List<KeyboardButton>
             {
-                new KeyboardButton("🔧 Админ панель")
+                new KeyboardButton("🔧 Admin paneli")
             });
         }
 
@@ -41,15 +41,15 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("👨‍💼 Управление сотрудниками", "admin_manage_employees")
+                InlineKeyboardButton.WithCallbackData("👨‍💼 Xodimlarni boshqarish", "admin_manage_employees")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("📊 Статистика сотрудников", "admin_employee_statistics")
+                InlineKeyboardButton.WithCallbackData("📊 Xodimlar statistikasi", "admin_employee_statistics")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("👀 Статус официантов", "admin_employee_status")
+                InlineKeyboardButton.WithCallbackData("👀 Статус ofitsiantов", "admin_employee_status")
             },
             new[]
             {
@@ -76,7 +76,7 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Добавить сотрудника", "admin_add_employee")
+                InlineKeyboardButton.WithCallbackData("➕ Qo'shish сотрудника", "admin_add_employee")
             },
             new[]
             {
@@ -95,12 +95,12 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("Официант", $"set_employee_role_{EmployeeRole.Waiter}"),
-                InlineKeyboardButton.WithCallbackData("Админ", $"set_employee_role_{EmployeeRole.Admin}")
+                InlineKeyboardButton.WithCallbackData("Ofitsiant", $"set_employee_role_{EmployeeRole.Waiter}"),
+                InlineKeyboardButton.WithCallbackData("Admin", $"set_employee_role_{EmployeeRole.Admin}")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("❌ Отмена", "admin_cancel")
+                InlineKeyboardButton.WithCallbackData("❌ Bekor qilish", "admin_cancel")
             }
         });
     }
@@ -156,7 +156,7 @@ public static class KeyboardBuilder
         },
         new[]
         {
-            InlineKeyboardButton.WithCallbackData("❌ Отмена", "cancel")
+            InlineKeyboardButton.WithCallbackData("❌ Bekor qilish", "cancel")
         }
     });
 }
@@ -202,7 +202,7 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Добавить продукт", "admin_add_product")
+                InlineKeyboardButton.WithCallbackData("➕ Qo'shish продукт", "admin_add_product")
             },
             new[]
             {
@@ -221,7 +221,7 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Добавить категорию", "admin_add_category")
+                InlineKeyboardButton.WithCallbackData("➕ Qo'shish категорию", "admin_add_category")
             },
             new[]
             {
@@ -240,18 +240,18 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("шт (штуки)", $"set_product_unit_{ProductUnit.Piece}"),
-                InlineKeyboardButton.WithCallbackData("кг (килограммы)", $"set_product_unit_{ProductUnit.Kg}")
+                InlineKeyboardButton.WithCallbackData("dona (dona)", $"set_product_unit_{ProductUnit.Piece}"),
+                InlineKeyboardButton.WithCallbackData("kg (kilogramm)", $"set_product_unit_{ProductUnit.Kg}")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("г (граммы)", $"set_product_unit_{ProductUnit.Gram}"),
-                InlineKeyboardButton.WithCallbackData("л (литры)", $"set_product_unit_{ProductUnit.Liter}")
+                InlineKeyboardButton.WithCallbackData("g (gramm)", $"set_product_unit_{ProductUnit.Gram}"),
+                InlineKeyboardButton.WithCallbackData("l (litr)", $"set_product_unit_{ProductUnit.Liter}")
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("мл (миллилитры)", $"set_product_unit_{ProductUnit.Ml}"),
-                InlineKeyboardButton.WithCallbackData("❌ Отмена", "admin_cancel")
+                InlineKeyboardButton.WithCallbackData("ml (millilitr)", $"set_product_unit_{ProductUnit.Ml}"),
+                InlineKeyboardButton.WithCallbackData("❌ Bekor qilish", "admin_cancel")
             }
         });
     }
@@ -262,7 +262,7 @@ public static class KeyboardBuilder
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("➕ Добавить комнату", "admin_add_room")
+                InlineKeyboardButton.WithCallbackData("➕ Qo'shish комнату", "admin_add_room")
             },
             new[]
             {

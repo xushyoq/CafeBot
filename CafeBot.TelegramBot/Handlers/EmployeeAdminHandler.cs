@@ -230,7 +230,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Неверный формат даты. Введите дату в формате ДД.ММ.ГГГГ (например: 01.12.2025):",
+                text: "❌ Noto'g'ri format даты. Введите дату в формате ДД.ММ.ГГГГ (например: 01.12.2025):",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -251,7 +251,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Неверный формат даты. Введите дату в формате ДД.ММ.ГГГГ (например: 31.12.2025):",
+                text: "❌ Noto'g'ri format даты. Введите дату в формате ДД.ММ.ГГГГ (например: 31.12.2025):",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -275,7 +275,7 @@ public class EmployeeAdminHandler
         {
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: "❌ Дата конца должна быть позже даты начала. Попробуйте еще раз:",
+                text: "❌ Дата конца должна быть позже даты начала. Qaytadan urinib ko'ring:",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -346,13 +346,13 @@ public class EmployeeAdminHandler
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: chatId,
-                    text: "👀 Статус официантов\n\n❌ Нет активных официантов.",
+                    text: "👀 Статус ofitsiantов\n\n❌ Нет активных ofitsiantов.",
                     replyMarkup: KeyboardBuilder.AdminMainMenuKeyboard(),
                     cancellationToken: cancellationToken);
                 return;
             }
 
-            var message = "👀 Статус официантов\n\n";
+            var message = "👀 Статус ofitsiantов\n\n";
 
             foreach (var status in statusList.OrderBy(s => s.EmployeeName))
             {

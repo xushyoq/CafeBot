@@ -74,7 +74,7 @@ public class ProductService : IProductService
         var category = await _unitOfWork.Categories.GetByIdAsync(categoryId);
         if (category == null)
         {
-            throw new ArgumentException("Категория не найдена");
+            throw new ArgumentException("Kategoriya не найдена");
         }
 
         var product = new Product
@@ -110,7 +110,7 @@ public class ProductService : IProductService
             var category = await _unitOfWork.Categories.GetByIdAsync(categoryId.Value);
             if (category == null)
             {
-                throw new ArgumentException("Категория не найдена");
+                throw new ArgumentException("Kategoriya не найдена");
             }
             product.CategoryId = categoryId.Value;
         }
